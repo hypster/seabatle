@@ -1,0 +1,14 @@
+@font-face {
+    font-family: 'custom';
+    src: url('../assets/font/dialog.ttf');
+      /* src: url('../assets/font/test/HiraMaruProN-W4-AlphaNum.eot');
+    src: url('../assets/font/test/HiraMaruProN-W4-AlphaNum.woff2') format('woff2'),
+        url('../assets/font/test/HiraMaruProN-W4-AlphaNum.woff') format('woff'),
+        url('../assets/font/test/HiraMaruProN-W4-AlphaNum.ttf') format('truetype'),   */
+     /* src: url('../assets/font/affectionately_yours/Affectionately Yours - OTF.otf');  */
+}
+
+body {
+    background-color: black;
+    font-family: "custom";
+}
