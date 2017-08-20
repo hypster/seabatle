@@ -34,9 +34,7 @@ const Level = {
         }
         util.setScale(this)
         
-        // this.boundsW = game.cache._cache.image.level1_dialog_bg.frame.width
-        // this.boundsH = game.cache._cache.image.level1_dialog_bg.frame.height
-        
+    
         this.bg = game.add.sprite(700, game.global.DURATION, 'level1_dialog_bg')
 
         util.centerGameObjects([this.bg])
@@ -230,7 +228,6 @@ const Level = {
     startQuiz () {
         this.currentMode = ''
         this.currentAnswer = []
-        this.buttonGroup 
         //问答框
         let quizBox = this.quizBox = game.add.image(0, 0, 'quiz_box')
         quizBox.scale.setTo(1.5)
@@ -248,29 +245,26 @@ const Level = {
 
         }
 
-        var style = {
-            font: "28px custom", fill: "#000",
-            boundsAlignH: "left",
-            boundsAlignV: "top",
-            align: 'left',
-        } 
-
         q_set.question = this.makeLine(q_set.question, game.global.QUIZ_LINE_WORDS).join('\n')
         //text group
         let textGroup = game.add.group()
         this.textGroup = textGroup
+        
         this.quizGroup.add(textGroup)
-        let quizText = game.add.text(0, 0, q_set.question, style)
+        quizText = game.add.text(this.quizBox.x + 100, 0, q_set.question, this.style)
         textGroup.add(quizText)
         //当前对话文字对象
         quizText.lineSpacing = 5
+        //
+        this.buttonGroup = game.add.group()
+        this.textGroup.add(this.buttonGroup)
         // this.quizText.setShadow(3, 3, 'rgba(0,0,0,0.5)', 2);
-        quizText.setTextBounds(
-            this.quizBox.x + 100,
-            this.quizBox.y + 100,
-            this.quizBox.width - 100,
-            this.quizBox.height - 100
-        )
+        // quizText.setTextBounds(
+        //     this.quizBox.x + 100,
+        //     this.quizBox.y + 100,
+        //     this.quizBox.width - 100,
+        //     this.quizBox.height - 100
+        // )
         
         // title = game.add.image(0, 0, 'title')
         // title.scale.setTo(0.6)
@@ -283,85 +277,73 @@ const Level = {
         // }))
         // title_text.setTextBounds(title.x, title.y, title.width, title.height)
 
-        switch (this.currentMode) {
-            case 'single':
-                this.buttonGroup = this.loadOptionButtons(4)
-                // title_text.text = '单选题'
-                break
-                case 'multiple':
-                this.buttonGroup = this.loadOptionButtons(5)
-                // title_text.text = '多选题'
-                break
-                case 'truth':
-                this.buttonGroup = this.loadOptionButtons(2)
-                // title_text.text = '判断题'
-                break
-        }
-
-
-        this.loadOptionText(q_set)
-
-        let submit = game.add.button(0, 0,  'button_submit', null, this, 1, 1, 0, 1)
+        // switch (this.currentMode) {
+        //     case 'single':
+        //         this.buttonGroup = this.loadOptionButtons(4)
+        //         // title_text.text = '单选题'
+        //         break
+        //         case 'multiple':
+        //         this.buttonGroup = this.loadOptionButtons(5)
+        //         // title_text.text = '多选题'
+        //         break
+        //         case 'truth':
+        //         this.buttonGroup = this.loadOptionButtons(2)
+        //         // title_text.text = '判断题'
+        //         break
+        //     }
+            
+            
+        this.loadOption(q_set)
+        // this.buttonGroup = this.loadOptionButtons()
+        let submitGroup = game.add.group()
+        this.quizGroup.add(submitGroup)
+        let submit = game.add.button(0, 0,  'button_submit', null, this, 1, 1, 0, 1, submitGroup)
         submit.scale.setTo(2)
         submit.x =  this.quizBox.x + this.quizBox.width/2 - submit.width/2
         submit.y = this.quizBox.y + this.quizBox.height - 84 - submit.height/2
-        this.buttonGroup.add(submit)
         submit.onInputUp.addOnce(this.onsubmit, this)
         txt = game.add.text(0 , 2, '确定', Object.assign({}, this.style, {font: '24px custom', boundsAlignH: "center",
         boundsAlignV: "middle",
         align: 'center',
         fill: '#dfcab0'
-        }), this.buttonGroup)
+        }), submitGroup)
         txt.setTextBounds(submit.x, submit.y, submit.width, submit.height)
-        this.quizGroup.add(this.buttonGroup)
         
         this.quizGroup.setAll('alpha', 0)
         let alpha_tween = game.add.tween(this.quizBox)
         alpha_tween.to({alpha: 1}, game.global.DURATION, Phaser.Easing.Default, true, 0, 0, false)
         let text_tween = game.add.tween(textGroup)
-        let button_tween = game.add.tween(this.buttonGroup)
+        let submit_tween = game.add.tween(submitGroup)
+        // let button_tween = game.add.tween(this.buttonGroup)
         alpha_tween.onComplete.add(function () {
             text_tween.to({alpha: 1}, game.global.DURATION, Phaser.Easing.Default, true, 0, 0 ,false)
-            button_tween.to({alpha: 1}, game.global.DURATION, Phaser.Easing.Default, true, 0, 0 ,false)
+            submit_tween.to({alpha: 1}, game.global.DURATION, Phaser.Easing.Default, true, 0, 0 ,false)
+            // button_tween.to({alpha: 1}, game.global.DURATION, Phaser.Easing.Default, true, 0, 0 ,false)
         })
     
     },
-    loadOptionButtons (total) {
-        total = total? total: 4
-        let cnt = 0
-        this.optionButtons = []
-        let buttonGroup = game.add.group(this.buttonGroup)
-        let ROW = Math.ceil(total/2)
-        for(let j =0; j < ROW; j++) {
-            for (let i = 0; i < 2; i++) {
-                cnt = j * 2 + i
-                if (cnt > total - 1) {
-                    return buttonGroup
-                }
-                let button
-                if (total > 4) { 
-                    button = game.add.button(360, 300 + cnt * 40, 'buttons', 0)
-                } else {
-                    button = game.add.button(360 + i * 160, 440 + j * 40, 'buttons', 0)
-                }
-                button.inputEabled = true
-                button.selected = false
-                button.index = j * 2 + i
-                    //  Enable the hand cursor
-                button.input.useHandCursor = true;
-                button.onInputDown.add(this.onselect, this)
-                buttonGroup.add(button)
-                this.optionButtons.push(button)
-            }
-        }
-        return buttonGroup
+  
+    addButton (x, y, cnt) {
+        let button = game.add.button(x, y, 'buttons', 0)
+        button.inputEabled = true
+        button.selected = false
+        button.index = cnt
+            //  Enable the hand cursor
+        button.input.useHandCursor = true;
+        button.onInputDown.add(this.onselect, this)
+        this.buttonGroup.add(button)
+        // buttonGroup.add(button)
+        this.optionButtons.push(button)
+
     },
-    loadOptionText (q_set) {
+    loadOption (q_set) {
         let answer = q_set.answer
+        this.optionButtons = []
+        //shuffle选项
         if (this.currentMode === 'single') {
-            this.currentOptions = answer
             this.currentCorrect = answer[0]
             this.shuffle(answer)
+            this.currentOptions = answer
             
         } else if (this.currentMode === 'truth') {
             this.currentOptions = ["正确", '错误']
@@ -378,10 +360,31 @@ const Level = {
                 this.shuffle(this.currentOptions)
             }
         }
-        this.currentOptions.forEach((a, index) => {
-            let text = game.add.text(this.buttonGroup.children[index].x + 30, this.buttonGroup.children[index].y, a, Object.assign({}, this.style, {font: '24px custom'}), this.quizGroup)
-            this.textGroup.add(text)
-        })
+
+        let total = this.currentOptions.length
+        let cnt = 0
+        let ROW = Math.ceil(total/2)
+        let qBounds = this.textGroup.children[0].getBounds()
+        let _h = qBounds.height
+        console.log(_h)
+        let margin = 50
+        let _text
+        for (let j = 0; j < ROW; j++) {
+            for (let i = 0; i < 2; i++) {
+                cnt = j * 2 + i
+                if (cnt > total -1) {
+                    break
+                }
+                if (total > 4) {
+                    _text = game.add.text(390, _h + margin + cnt * 40, this.currentOptions[cnt], Object.assign({}, this.style, {font: '24px custom'}), this.textGroup)
+                } else {
+                    _text = game.add.text(390 + i * 160,  _h + margin + j * 40, this.currentOptions[cnt], Object.assign({}, this.style, {font: '24px custom'}), this.textGroup)
+                }
+                this.addButton(_text.x - 30, _text.y, cnt)
+            }
+        }
+        
+        this.textGroup.y = this.quizBox.y + (this.quizBox.height - this.textGroup.height)/2
     },
     loadQuestionSet () {
         let q_set = null
@@ -507,11 +510,11 @@ const Level = {
         let index
         let temp
         while (i > 0) {
-            temp = array[i - 1]
-            index = Math.floor(Math.random(0, i))
-            array[i - 1]  = array[index]
-            array[index] = temp
+            index = Math.floor(Math.random() * i)
             i--
+            temp = array[i]
+            array[i]  = array[index]
+            array[index] = temp
         }
      }
 }
