@@ -48,6 +48,7 @@ const Menu = {
     nextState () {
             music.stop()
             game.state.start('Map')
+            // game.state.start('Level')
     },
     changeStyle (target) {
         target = target ? target: this.menu[this.currentMenu]

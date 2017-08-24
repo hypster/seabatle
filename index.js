@@ -1,4 +1,4 @@
-const game = new Phaser.Game(1024, 768, Phaser.AUTO,"seabattle")
+const game = new Phaser.Game(1334, 750, Phaser.AUTO,"seabattle")
 game.global = {
     WORD_DELAY: 20,
     // 80,
@@ -10,6 +10,12 @@ game.global = {
     QUIZ_LINE_WORDS: 15,
     DURATION: 100,
     DELAY: 100,
+    KEYMAP: {
+        single: '单选题',
+        multiple: '多选题',
+        truth: '判断题'
+    },
+    SCALE: 4
 }
 let music
 const Main = {
@@ -23,7 +29,6 @@ const Main = {
     },
     create () {
         util.setScale(this)
-        console.log('in main create')
         game.state.add('Loading', Loading)
         game.state.start('Loading')
     }

@@ -1,7 +1,8 @@
 const Loading = {
     init() {
-        this.bg = game.add.image(0, 0, 'loading_bg')
+        this.bg = game.add.image(game.world.centerX, game.world.centerY, 'loading_bg')
         this.loadingBar = game.add.image(game.world.centerX, game.world.centerY, 'loading_bar')
+        this.bg.anchor.setTo(0.5)
         this.loadingBar.anchor.setTo(0.5)
     },
     preload() {
@@ -12,6 +13,7 @@ const Loading = {
         this.loadScript()
         this.loadBgm()
         this.loadImage()
+        this.loadOthers()
 
     },
     loadBgm() {
@@ -25,8 +27,12 @@ const Loading = {
         game.load.script('map', 'map.js')
         game.load.script('level', 'level.js')
         game.load.text('level1_text', 'assets/level1.json')
+        // game.load.text('level1_text', 'level1test.json')
         game.load.physics('physicsData', 'assets/physics.json');
-        game.load.script('test', 'test.js')
+        // game.load.script('test', 'test.js')
+    },
+    loadOthers () {
+        game.load.tilemap('tilemap', '/assets/tilemap.json', null, Phaser.Tilemap.TILED_JSON)
     },
     loadFonts() {
         WebFontConfig = {
@@ -53,6 +59,10 @@ const Loading = {
         game.load.image('map', 'assets/map.png')
         game.load.image('map_sea', 'assets/map_sea.jpg')
         game.load.image('map_mountain', 'assets/map_mountain.jpg')
+        //tileset
+        game.load.image('grand', 'assets/tiles/grand.png')
+        game.load.image('collision16x16', 'assets/tiles/collision16x16.png')
+        game.load.image('water', 'assets/tiles/water.png')
         // game.load.atlas('knight', 'assets/knight.png', 'assets/knight.json')
         game.load.spritesheet('knight1', 'assets/knight2a.png', 32, 32, 12)
         game.load.image('level1_building', 'assets/building/1.png')
@@ -72,18 +82,20 @@ const Loading = {
         game.state.add('Menu', Menu)
         game.state.add('Map', Map)
         game.state.add('Level', Level)
-        game.state.add('test', test)
+        // game.state.add('test', test)
 
     },
     create() {
         this.addGameState()
+        game.scale.fullScreenScaleMode = Phaser.ScaleManager.SHOW_ALL
         this.status.setText('加载完毕, 单击开始游戏')
         console.log('load complete')
-        game.input.onTap.add(function (pointer) {
-            // game.state.start('Menu')
+        game.input.onTap.addOnce(function (pointer) {
+            game.state.start('Menu')
             // game.state.start('test')
             // game.state.start('Map')
-            game.state.start('Level')
+            // game.state.start('Level')
+            // game.scale.startFullScreen(false)
             game.state.states.Level.currentLevel = 0
             // music.stop()
             // game.state.start('Level')
