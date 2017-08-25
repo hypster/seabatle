@@ -8,8 +8,8 @@ game.global = {
     LINE_WORDS: 22,
     LEVELS: [0, -1, -1, -1, -1],
     QUIZ_LINE_WORDS: 15,
-    DURATION: 100,
-    DELAY: 100,
+    DURATION: 1000,
+    DELAY: 1000,
     KEYMAP: {
         single: '单选题',
         multiple: '多选题',
@@ -28,6 +28,7 @@ const Main = {
         game.load.script('util', 'util.js')
     },
     create () {
+        game.canvas.oncontextmenu = function (e) { e.preventDefault(); }
         util.setScale(this)
         game.state.add('Loading', Loading)
         game.state.start('Loading')

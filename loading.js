@@ -63,6 +63,12 @@ const Loading = {
         game.load.image('grand', 'assets/tiles/grand.png')
         game.load.image('collision16x16', 'assets/tiles/collision16x16.png')
         game.load.image('water', 'assets/tiles/water.png')
+
+        //button
+        game.load.image('left', 'assets/button/left.png')
+        game.load.image('up', 'assets/button/up.png')
+        game.load.image('right', 'assets/button/right.png')
+        game.load.image('down', 'assets/button/down.png')
         // game.load.atlas('knight', 'assets/knight.png', 'assets/knight.json')
         game.load.spritesheet('knight1', 'assets/knight2a.png', 32, 32, 12)
         game.load.image('level1_building', 'assets/building/1.png')
