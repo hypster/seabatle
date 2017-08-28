@@ -5,17 +5,22 @@ game.global = {
     LINE_DELAY: 20,
     // 200,
     MAX_LINE: 3,
-    LINE_WORDS: 22,
-    LEVELS: [0, -1, -1, -1, -1],
+    LINE_WORDS: 28,
+    LEVELS: [0, 0, -1, -1, -1],
     QUIZ_LINE_WORDS: 15,
-    DURATION: 1000,
-    DELAY: 1000,
+    DURATION: 100,
+    DELAY: 100,
     KEYMAP: {
         single: '单选题',
         multiple: '多选题',
         truth: '判断题'
     },
-    SCALE: 4
+    SCALE: 4,
+    SPEED: 300,
+    ENTRYTOLEVEL: {
+        castle: 1,
+        shipYard: 2
+    }
 }
 let music
 const Main = {

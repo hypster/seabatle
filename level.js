@@ -1,13 +1,14 @@
-const Level = {
+class Level extends Phaser.State {
+    constructor (level) {
+        super()
+        this.level = level
+    }
     preload() {
-        this.level = 1
-
         this.finish = false
-        // i = 0
-    },
+    }
     create() {
         music = game.add.audio('castle')
-        // music.play()
+        music.play()
         
         let _obj = JSON.parse(game.cache.getText('level' + this.level + '_text'))
 
@@ -30,7 +31,7 @@ const Level = {
 
         this.line = ''
 
-        score = this.score = 0
+        this.score = 0
 
 
         this.style = {
@@ -51,17 +52,20 @@ const Level = {
         
         // this.startQuiz()
         this.rollCamera(this.startDialog) 
-    },
+    }
 
     update() {
 
 
-    },
+    }
     render() {
         game.debug.geom(this.prompt, 'rgba(255,0,0,0.5)')
         game.debug.cameraInfo(game.camera, 0, 0)
         game.debug.geom(this.textGroup)
-    },
+        game.debug.geom(this.mask, 'red')
+        // game.debug.body(this.mask, 'red')
+        
+    }
     rollCamera (cb) {
         let x_tween = game.add.tween(this.bg)
         let y_tween = game.add.tween(this.bg)
@@ -77,24 +81,25 @@ const Level = {
         })
         
         scale_tween.onComplete.addOnce(() => game.time.events.add(game.global.DURATION, cb, this), this) 
-    },
+    }
 
     startDialog() {
         this.dialogGroup = game.add.group()
-        
         //对话框对象
         this.dialogBox = game.add.sprite(0, 0, 'dialog_box')
-        // let _expectedW = game.width * 2/3
-        // this.dialogBox.scale.setTo(_expectedW / this.dialogBox.width)
+        
         this.dialogBox.x = (game.width - this.dialogBox.width)/2
         this.dialogBox.y = game.height - this.dialogBox.height - 20
-        // this.dialogBox = game.add.sprite((game.width - _w) / 2, game.height - _h - 20, 'dialog_box')
+        
+        let mask = this.mask = game.add.graphics(this.dialogBox.x, this.dialogBox.y)
+        //shapes on mask must be filled!
+        mask.beginFill(0xff00000)
+        let rect = this.rect = new Phaser.Rectangle(mask.x + 16, mask.y + 19, 1083, 222)
+        // mask.drawRect(16, 19 - 200, 861, 222 + 200)
+        mask.drawRect(16, 19 - 200, 1083, 222 + 200)
         
         this.dialogGroup.add(this.dialogBox)
-        // 当前对话人物图片
-        this.currentFacial = game.add.sprite(this.dialogBox.x, this.dialogBox.y, 'hero_facial')
-        this.dialogGroup.add(this.currentFacial)
-
+        
         // 当前对话信息
         this.current
         let textGroup = game.add.group()
@@ -111,25 +116,20 @@ const Level = {
         textGroup.add(this.text)
         this.text.lineSpacing = 5
         this.text.setShadow(3, 3, 'rgba(0,0,0,0.5)', 2);
-        this.text.setTextBounds(
-            this.dialogBox.x + this.currentFacial.width + this.text_padding,
-            this.dialogBox.y + 74,
-            this.dialogBox.width - this.currentFacial.width - 5 * this.text_padding,
-            this.dialogBox.height - 6 * this.text_padding
-        )
-
+        
         // 当前人物名字对象
-        this.speakerName = game.add.text(this.dialogBox.x + this.currentFacial.width + this.text_padding, this.dialogBox.y + 30, '', nameStyle)
+        this.speakerName = game.add.text(0, 0, '', nameStyle)
         textGroup.add(this.speakerName)
         //提示符对象
-        this.prompt = game.add.image(this.dialogBox.x + this.dialogBox.width - 80, this.dialogBox.y + this.dialogBox.height - 42, 'dialog_prompt')
+        
+        this.prompt = game.add.image(this.dialogBox.x + this.dialogBox.width - 80, this.dialogBox.y + this.dialogBox.height - 20, 'dialog_prompt')
         this.prompt.alpha = 0
         this.dialogGroup.add(this.prompt)
 
         //载入对话信息
         this.nextDialog()
 
-    },
+    }
 
     nextDialog() {
         //当前行数
@@ -137,24 +137,58 @@ const Level = {
         //当前文本信息{人物名, 人物脚本}
         let current = this.dialog.shift()
         //脚本
+        let facing = ''
+        let scale_factor = 1
+        let _x_bound = 0
+        let _y_bound = 0
+        let _width_bound = 0
+        let _height_bound = 0
+        if (current.left) {
+            facing = Phaser.BOTTOM_LEFT
+            _x_bound = this.dialogBox.x + 280 + this.text_padding
+            _y_bound = this.dialogBox.y + 74
+            _width_bound = this.rect.width - 280
+            _height_bound = this.dialogBox.height - 6 * this.text_padding
+            this.prompt.x = this.dialogBox.x + this.dialogBox.width - 80
+        }
+        else {
+                facing = Phaser.BOTTOM_RIGHT
+                scale_factor = -1
+                _x_bound = this.dialogBox.x  + 4 * this.text_padding
+                _y_bound = this.dialogBox.y + 74
+                _width_bound = this.rect.width - 280
+                _height_bound = this.dialogBox.height - 6 * this.text_padding
+                this.prompt.x = this.dialogBox.x + 4 * this.text_padding
+        } 
+        if (this.currentFacial) {
+            this.currentFacial.destroy()
+        }
+        this.currentFacial = game.add.sprite(0, 0, current.key + '_facial')
+        this.dialogGroup.add(this.currentFacial, true, 1)
+        this.currentFacial.anchor.setTo(0.5, 1)
+
+        this.currentFacial.alignIn(this.rect, facing, current.x ? current.x : 0, current.y ? current.y: 0)
+        this.currentFacial.mask = this.mask
+        if (current.scale) {
+            this.currentFacial.scale.setTo(scale_factor * current.scale, current.scale)
+        }
+        
         let _text = current.text
+        this.text.text = ''
+        this.text.setTextBounds(
+            _x_bound,
+            _y_bound,
+            _width_bound,
+            _height_bound
+        )
         
         this.speakerName.text = current.name
-        
-        this.text.text = ''
-        this.currentFacial.destroy()
-        this.currentFacial = game.add.sprite(this.dialogBox.x, this.dialogBox.y, current.key + '_facial')
-        this.dialogGroup.add(this.currentFacial)
-        if (current.x) {
-            this.currentFacial.x = this.dialogBox.x + current.x
-        }
-        if (current.y) {
-            this.currentFacial.y = this.dialogBox.y + current.y
-        }
+        this.speakerName.x = _x_bound
+        this.speakerName.y = this.dialogBox.y + 30
         //对话拆分数组
         this.lines = this.makeLine(_text, game.global.LINE_WORDS)
         this.nextLine()
-    },
+    }
     //["each line ", "each line"]
     makeLine(str, maxLineWord) {
         let _str = str.split('\n')
@@ -180,7 +214,7 @@ const Level = {
         })
         _str = [].concat.apply([], _str)
         return _str.join('').split('\n')
-    },
+    }
 
     nextLine() {
         //对话结束注册tap事件
@@ -192,7 +226,7 @@ const Level = {
             game.time.events.repeat(game.global.WORD_DELAY, line.length, this.nextWord, this, line);
             this.lineIndex++
         }
-    },
+    }
     nextWord(line) {
         this.text.text = this.text.text.concat(line[this.wordIndex]);
         this.wordIndex++;
@@ -201,12 +235,12 @@ const Level = {
             this.text.text = this.text.text.concat('\n')
             game.time.events.add(game.global.LINE_DELAY, this.nextLine, this);
         }
-    },
+    }
     promptTween() {
         this.prompt.alpha = 1
         this.tween_prompt = game.add.tween(this.prompt).to({ y: this.prompt.y + 2 }, 100, Phaser.Easing.Bounce.InOut, false, 100, 3, true).start()
         this.tween_prompt.onComplete.addOnce(this.promptTween, this)
-    },
+    }
     onTap() {//对话框文字显示完成后需要加载的内容，游戏主要节点
         if (this.finish) {
             return game.state.start('Map')
@@ -217,28 +251,48 @@ const Level = {
         this.text.text = ''
         //所有会话结束进入问答环节
         if (!this.dialog.length) {
-            this.lineIndex = 0
             console.log('you finished all level 1 dialog')
-            if (!this.q_set)
-                this.q_set = this.loadQuestionSet()
-            if (!this.q_set) {
-                this.lineIndex = 0
-                if (this.score < 8) {
-                    this.dialog = this.endDialog.failure
-                } else {
-                    this.dialog = this.endDialog.success
+            if (this.lines.length != this.lineIndex) {
+                // debugger
+                let colors = {}
+                for (let i = 0; i < this.text.colors.length; i++) {
+                    if (this.text.colors[i]) {
+                        colors[this.text.colors[i]] = i
+                    }
                 }
+                console.log(colors)
+                let _red_start = colors['red']
+                let _normal_start = colors['#fff']                
                 this.text.clearColors()
-                this.finish = true
-                this.nextDialog()
-        
+                // _red_start - this.lineIndex * game.global.LINE_WORDS
+                this.text.addColor('red', 0)
+                this.text.addColor('#fff', _normal_start - this.lineIndex * game.global.LINE_WORDS)
+                this.lines.splice(0, this.lineIndex)
+                this.lineIndex = 0
+                this.nextLine()
             } else {
-                let _t = game.add.tween(this.dialogGroup).to({alpha: 0}, game.global.DURATION, Phaser.Easing.Default, true, game.global.DURATION, 0, false)
-                _t.onComplete.add(function () { 
-                    this.startQuiz()
-                }, this)
+                this.lineIndex = 0
+                if (!this.q_set)
+                    this.q_set = this.loadQuestionSet()
+                if (!this.q_set) {
+                    this.lineIndex = 0
+                    if (this.score < 8) {
+                        this.dialog = this.endDialog.failure
+                    } else {
+                        this.dialog = this.endDialog.success
+                    }
+                    this.text.clearColors()
+                    this.finish = true
+                    this.nextDialog()
+            
+                } else {
+                    let _t = game.add.tween(this.dialogGroup).to({alpha: 0}, game.global.DURATION, Phaser.Easing.Default, true, game.global.DURATION, 0, false)
+                    _t.onComplete.add(function () { 
+                        this.startQuiz()
+                    }, this)
+                }
+                // this.startQuiz()
             }
-            // this.startQuiz()
         }
         //加载剩余会话
         else if (this.lines.length != this.lineIndex) {
@@ -252,18 +306,19 @@ const Level = {
             this.nextDialog()
         }
         
-    },
+    }
     startQuiz () {
         // this.currentMode = ''
         this.currentAnswer = []
         //问答框
         let quizBox = this.quizBox = game.add.image(0, 0, 'quiz_box')
         quizBox.scale.setTo(1.5)
-        quizBox.x = game.world.centerX - quizBox.width/2
-        quizBox.y = game.world.centerY - quizBox.height/2
         quizBox.alpha = 0
         
         this.quizGroup = game.add.group()
+        this.quizGroup.x = game.world.centerX - quizBox.width/2
+        this.quizGroup.y = 0
+        this.quizGroup.scale.setTo(1.1)
         this.quizGroup.add(this.quizBox)
 
         // let q_set = this.loadQuestionSet()
@@ -286,7 +341,7 @@ const Level = {
         this.textGroup = textGroup
         
         this.quizGroup.add(textGroup)
-        quizText = game.add.text(this.quizBox.x + 100, 0, this.q_set.question, this.style)
+        let quizText = game.add.text(this.quizBox.x + 100, 0, this.q_set.question, this.style)
         textGroup.add(quizText)
         //当前对话文字对象
         quizText.lineSpacing = 5
@@ -304,7 +359,7 @@ const Level = {
         submit.x =  this.quizBox.x + this.quizBox.width/2 - submit.width/2
         submit.y = this.quizBox.y + this.quizBox.height - 84 - submit.height/2
         submit.onInputUp.addOnce(this.onsubmit, this)
-        txt = game.add.text(0 , 2, '确定', Object.assign({}, this.style, {font: '24px custom', boundsAlignH: "center",
+        let txt = game.add.text(0 , 2, '确定', Object.assign({}, this.style, {font: '28px custom', boundsAlignH: "center",
         boundsAlignV: "middle",
         align: 'center',
         fill: '#dfcab0'
@@ -325,7 +380,7 @@ const Level = {
             // button_tween.to({alpha: 1}, game.global.DURATION, Phaser.Easing.Default, true, 0, 0 ,false)
         })
     
-    },
+    }
 
     setTitle () {
         let title = game.add.image(0, 0, 'title')
@@ -333,7 +388,7 @@ const Level = {
         title.scale.setTo(0.6)
         title.x = this.quizBox.x + this.quizBox.width/2 - title.width/2
         title.y = this.quizBox.y + 50
-        title_text = game.add.text(0, 0, '', Object.assign({}, this.style,  {font: '18px custom', boundsAlignH: "center",
+        let title_text = game.add.text(0, 0, '', Object.assign({}, this.style,  {font: '18px custom', boundsAlignH: "center",
         boundsAlignV: "middle",
         align: 'center',
         fill: '#dfcab0'
@@ -351,7 +406,7 @@ const Level = {
                 title_text.text = '判断题'
                 break
             }
-    },
+    }
   
     addButton (x, y, cnt) {
         let button = game.add.button(x, y, 'buttons', 0)
@@ -365,7 +420,7 @@ const Level = {
         // buttonGroup.add(button)
         this.optionButtons.push(button)
 
-    },
+    }
     loadOption (q_set) {
         let answer = q_set.answer
         this.optionButtons = []
@@ -426,23 +481,23 @@ const Level = {
             })
         }
         this.textGroup.y = this.quizBox.y + (this.quizBox.height - this.textGroup.height)/2
-    },
+    }
     loadQuestionSet () {
         let q_set = null
-        if (this.questions.single.length) {
-            q_set = this.questions.single.shift()
-            this.currentMode = 'single'
-        }
-        else if (this.questions.multiple.length) {
+        if (this.questions.multiple.length) {
             q_set = this.questions.multiple.shift()
             this.currentMode = 'multiple'
         } 
+        else if (this.questions.single.length) {
+            q_set = this.questions.single.shift()
+            this.currentMode = 'single'
+        }
         else if (this.questions.truth.length) {
             q_set = this.questions.truth.shift()
             this.currentMode = 'truth'
         } 
         return q_set
-    },
+    }
     onselect (button) {
         button.selected = !button.selected
         console.log(button.selected)
@@ -480,7 +535,7 @@ const Level = {
             }
         }
         console.log(this.currentAnswer)
-    },
+    }
 
     onsubmit (button, pointer, isOver) {
         console.log('onsubmit')
@@ -492,13 +547,13 @@ const Level = {
         _t.onComplete.add(() => {
             this.quizGroup.destroy()
             this.giveFeedBack()}, this)
-    },
+    }
     giveFeedBack () {
         let _t = game.add.tween(this.dialogGroup)
         this.text.text = ''
         _t.to({alpha: 1}, game.global.DURATION, Phaser.Easing.Default, true, 0, 0, false)
         _t.onComplete.add(this.onComplete, this)
-    },
+    }
     onComplete () {
         //多选题逻辑单独
         if (this.currentMode !== 'multiple') {
@@ -527,7 +582,7 @@ const Level = {
             } 
             correct ? this.handleCorrect() : this.handleWrong()
         }
-    },
+    }
     handleCorrect () {
         this.score++
         this.text.clearColors()
@@ -546,7 +601,7 @@ const Level = {
             this.text.addColor('#fff', _length + 3)
         }
         this.nextLine()
-    },
+    }
     
     handleWrong () {
         this.text.clearColors()
@@ -578,7 +633,7 @@ const Level = {
         }
         this.nextLine()
 
-    },
+    }
      
     shuffle (array) {
         let i = array.length

@@ -26,7 +26,9 @@ const Loading = {
         game.load.script('Menu', 'menu.js')
         game.load.script('map', 'map.js')
         game.load.script('level', 'level.js')
+        game.load.script('levels', 'levels.js')
         game.load.text('level1_text', 'assets/level1.json')
+        game.load.text('level2_text', 'assets/level2.json')
         // game.load.text('level1_text', 'level1test.json')
         game.load.physics('physicsData', 'assets/physics.json');
         // game.load.script('test', 'test.js')
@@ -73,13 +75,15 @@ const Loading = {
         game.load.spritesheet('knight1', 'assets/knight2a.png', 32, 32, 12)
         game.load.image('level1_building', 'assets/building/1.png')
         game.load.image('level1_dialog_bg', 'assets/level1_dialog_bg.png')
-        game.load.image('hero_facial', 'assets/facial/hero.png')
-        game.load.image('dialog_box', 'assets/dialog_box.png')
+        game.load.image('hero_facial', 'assets/facial/hero1.png')
+        game.load.image('dialog_box', 'assets/dialog_box1.png')
         game.load.image('dialog_prompt', 'assets/dialog_prompt.png')
-        game.load.image('duke_facial', 'assets/facial/duke.png')
+        game.load.image('duke_facial', 'assets/facial/duke1.png')
         game.load.image('quiz_box', 'assets/quiz_box.png')
         game.load.spritesheet('buttons', 'assets/buttons.png', 30, 30, 6, 0, 0)
         game.load.image('title', 'assets/title.png')
+
+        game.load.image('builder_facial', 'assets/facial/builder.png')
         // game.load.image('title', 'assets/title1.png')
         // game.load.spritesheet('buttons', 'assets/buttons.png', 30, 30, 6, 0, 0)
         game.load.spritesheet('button_submit', 'assets/button_submit.png', 74, 26, 2, 0, 0)
@@ -87,7 +91,9 @@ const Loading = {
     addGameState() {
         game.state.add('Menu', Menu)
         game.state.add('Map', Map)
-        game.state.add('Level', Level)
+        // game.state.add('Level', Level)
+        game.state.add('level1', level1)
+        game.state.add('level2', level2)
         // game.state.add('test', test)
 
     },
@@ -97,12 +103,13 @@ const Loading = {
         this.status.setText('加载完毕, 单击开始游戏')
         console.log('load complete')
         game.input.onTap.addOnce(function (pointer) {
-            game.state.start('Menu')
+            // game.state.start('Menu')
             // game.state.start('test')
             // game.state.start('Map')
-            // game.state.start('Level')
+            
+            game.state.start('level1')
             // game.scale.startFullScreen(false)
-            game.state.states.Level.currentLevel = 0
+            // game.state.states.level1.currentLevel = 0
             // music.stop()
             // game.state.start('Level')
         }, this)

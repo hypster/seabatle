@@ -3,6 +3,7 @@ const Map = {
 
     },
     init () {
+        music.stop()
         this.map = game.add.tilemap('tilemap')
         this.map.addTilesetImage('grand')
         this.map.addTilesetImage('collision16x16')
@@ -26,18 +27,15 @@ const Map = {
         this.position = {}
         this.map.objects.position.forEach(pos => {
             this.position[pos.name] = pos
-        })
+        }, this)
         
-        this.castle = game.add.graphics(0, 0) 
-        this.castle.x = this.position.castle.x * game.global.SCALE
-        this.castle.y = this.position.castle.y * game.global.SCALE
-        this.castle.drawRect(0, 0, this.position.castle.width, this.position.castle.height)
-        this.castle.scale.setTo(4,4)
-        this.castle.x += 64
-        this.castle.y +=64
-        game.physics.arcade.enable(this.castle)
-        this.castle.body.immovable = true
-        this.castle.index = 0
+        this.entryPoints = []
+        this.entry = {}
+        this.map.objects.entry.forEach(pos => {
+            this.entry[pos.name] = pos
+            this.addEntryPoint(pos.name)
+        }, this)
+        
     },
     create() {
         
@@ -52,7 +50,6 @@ const Map = {
         this.knight.x += 64
         this.knight.y += 64
         this.knight.SPEED = 2
-        this.knight.anchor.setTo(0.5)
         
         this.knight.animations.add('right', [6, 7, 8], 10, true)
         this.knight.animations.add('left', [3, 4, 5], 10, true)
@@ -117,27 +114,31 @@ const Map = {
     update() {
         // this.knight.body.velocity.set(0);
         game.physics.arcade.collide(this.knight, this.layers.marker, function (){console.log('collide with bound')})
-        game.physics.arcade.collide(this.knight, this.castle, this.nextLevelHandler)
+        this.entryPoints.some(entry => {
+            return game.physics.arcade.collide(this.knight, entry, this.nextLevelHandler)
+
+        })
+        // game.physics.arcade.collide(this.knight, )
         this.knight.body.velocity.x = 0
         this.knight.body.velocity.y = 0
         if (cursors.left.isDown || cursors.right.isDown || cursors.up.isDown || cursors.down.isDown || this.left || this.right || this.up || this.down) {
             this.knight.play('walk')
             if (cursors.left.isDown || this.left) {
-                this.knight.body.velocity.x = -100
+                this.knight.body.velocity.x = -game.global.SPEED
                 this.knight.play('left')
             }
             else if (cursors.right.isDown || this.right) {
-                this.knight.body.velocity.x = 100
+                this.knight.body.velocity.x = game.global.SPEED
                 this.knight.play('right')
             }
             else if (cursors.up.isDown || this.up) {
                 
-                this.knight.body.velocity.y = -100
+                this.knight.body.velocity.y = -game.global.SPEED
                 this.knight.play('up')
             }
             else if (cursors.down.isDown || this.down) {
                 
-                this.knight.body.velocity.y = 100
+                this.knight.body.velocity.y = game.global.SPEED
                 this.knight.play('down')
             }
         } else {
@@ -152,18 +153,39 @@ const Map = {
         // game.debug.body(this.level1_entry)
     // game.debug.cameraInfo(game.camera, 500, 32);
     game.debug.spriteCoords(this.knight, 32, 32);
-    game.debug.body(this.castle, 'rgba(255,0, 0,0.5)')
-    game.debug.bodyInfo(this.castle, 100, 100)
+    // game.debug.body(this.entryPoints[0], 'rgba(255,0, 0,0.5)')
+    // game.debug.body(this.entryPoints[1], 'rgba(255,0, 0,0.5)')
+    // game.debug.geom(this.entryPoints[0], 'rgba(255,0, 0,0.5)')
+    // game.debug.body(this.castle, 'rgba(255,0, 0,0.5)')
+    // game.debug.bodyInfo(this.castle, 100, 100)
 
     },
     nextLevelHandler (sprite, levelBody) {
         console.log('collision')
-        if (game.global.LEVELS[levelBody.index] > -1) {
-            game.state.states.Level.currentLevel = levelBody.index
+        console.log(`level is ${levelBody.level}`)
+        if (game.global.LEVELS[levelBody.level - 1] > -1) {
+            // game.state.states.Level.currentLevel = levelBody.level
             music.stop()
-            game.state.start('Level')
+            console.log(`you enter level ${levelBody.level}`)
+            game.state.start('level' + levelBody.level)
         } else {
             console.log('you can\'t enter yet')
         }
+    },
+    addEntryPoint (key) {
+        let entry = game.add.graphics(0, 0) 
+        entry.key = key
+        entry.level = game.global.ENTRYTOLEVEL[key]
+        console.log(key, entry.level)
+        entry.beginFill(0xFF3300)
+        entry.drawRect(0, 0, this.entry[key].width, this.entry[key].height)
+        entry.endFill()
+        entry.scale.setTo(game.global.SCALE, game.global.SCALE)
+        entry.x = this.entry[key].x * game.global.SCALE
+        entry.y = this.entry[key].y * game.global.SCALE
+        game.physics.arcade.enable(entry)
+        entry.body.immovable = true
+        this.entryPoints.push(entry)
+        return entry
     }
 }
