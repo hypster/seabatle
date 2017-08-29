@@ -29,12 +29,14 @@ const Loading = {
         game.load.script('levels', 'levels.js')
         game.load.text('level1_text', 'assets/level1.json')
         game.load.text('level2_text', 'assets/level2.json')
+        game.load.text('level3_text', 'assets/level3.json')
         // game.load.text('level1_text', 'level1test.json')
         game.load.physics('physicsData', 'assets/physics.json');
         // game.load.script('test', 'test.js')
     },
     loadOthers () {
-        game.load.tilemap('tilemap', '/assets/tilemap.json', null, Phaser.Tilemap.TILED_JSON)
+        game.load.tilemap('tilemap', '/assets/tiles/tilemap.json', null, Phaser.Tilemap.TILED_JSON)
+        game.load.tilemap('bar', 'assets/tiles/bar.json', null, Phaser.Tilemap.TILED_JSON)
     },
     loadFonts() {
         WebFontConfig = {
@@ -66,13 +68,18 @@ const Loading = {
         game.load.image('collision16x16', 'assets/tiles/collision16x16.png')
         game.load.image('water', 'assets/tiles/water.png')
 
+        game.load.image('woodland1', 'assets/tiles/woodland_indoor_0.png')
+        game.load.image('woodland2', 'assets/tiles/woodland_indoor_x2.png')
+        game.load.image('woodland3', 'assets/tiles/woodland_indoor_x3.png')
+        game.load.image('woodland4', 'assets/tiles/tilesetformattedupdate1.png')
+
         //button
         game.load.image('left', 'assets/button/left.png')
         game.load.image('up', 'assets/button/up.png')
         game.load.image('right', 'assets/button/right.png')
         game.load.image('down', 'assets/button/down.png')
         // game.load.atlas('knight', 'assets/knight.png', 'assets/knight.json')
-        game.load.spritesheet('knight1', 'assets/knight2a.png', 32, 32, 12)
+        game.load.spritesheet('knight1', 'assets/character/hero.png', 32, 32)
         game.load.image('level1_building', 'assets/building/1.png')
         game.load.image('level1_dialog_bg', 'assets/level1_dialog_bg.png')
         game.load.image('hero_facial', 'assets/facial/hero1.png')
@@ -82,6 +89,7 @@ const Loading = {
         game.load.image('quiz_box', 'assets/quiz_box.png')
         game.load.spritesheet('buttons', 'assets/buttons.png', 30, 30, 6, 0, 0)
         game.load.image('title', 'assets/title.png')
+        game.load.image('warrior_facial', 'assets/facial/warrior.png')
 
         game.load.image('builder_facial', 'assets/facial/builder.png')
         // game.load.image('title', 'assets/title1.png')
@@ -94,6 +102,7 @@ const Loading = {
         // game.state.add('Level', Level)
         game.state.add('level1', level1)
         game.state.add('level2', level2)
+        game.state.add('level3', level3)
         // game.state.add('test', test)
 
     },
@@ -103,11 +112,13 @@ const Loading = {
         this.status.setText('加载完毕, 单击开始游戏')
         console.log('load complete')
         game.input.onTap.addOnce(function (pointer) {
-            // game.state.start('Menu')
+            game.state.start('Menu')
             // game.state.start('test')
             // game.state.start('Map')
             
-            game.state.start('level1')
+            // game.state.start('level1')
+            // game.state.start('level2')
+            // game.state.start('level3')
             // game.scale.startFullScreen(false)
             // game.state.states.level1.currentLevel = 0
             // music.stop()

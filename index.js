@@ -6,7 +6,7 @@ game.global = {
     // 200,
     MAX_LINE: 3,
     LINE_WORDS: 28,
-    LEVELS: [0, 0, -1, -1, -1],
+    LEVELS: [0, 0, 0, -1, -1],
     QUIZ_LINE_WORDS: 15,
     DURATION: 100,
     DELAY: 100,
@@ -16,10 +16,12 @@ game.global = {
         truth: '判断题'
     },
     SCALE: 4,
+    SCALE2: 2,
     SPEED: 300,
     ENTRYTOLEVEL: {
         castle: 1,
-        shipYard: 2
+        shipYard: 2,
+        bar: 3
     }
 }
 let music

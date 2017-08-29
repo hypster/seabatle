@@ -7,8 +7,20 @@ class Level extends Phaser.State {
         this.finish = false
     }
     create() {
-        music = game.add.audio('castle')
-        music.play()
+        this.map = game.add.tilemap('bar', 16, 16)
+        this.map.addTilesetImage('woodland_indoor_0', 'woodland1')
+        this.map.addTilesetImage('woodland_indoor_x2', 'woodland2')
+        this.map.addTilesetImage('woodland_indoor_x3', 'woodland3')
+        this.map.addTilesetImage('tilesetformattedupdate1', 'woodland4')
+        
+        util.addLayer.call(this, 'bar', game.global.SCALE2)
+        this.layers['ground'].resizeWorld()
+        
+        util.initWorld.call(this)
+        util.initMainCharacter.call(this, game.global.SCALE2, 10, 'startingPoint', 'knight1')
+        
+        // music = game.add.audio('castle')
+        // music.play()
         
         let _obj = JSON.parse(game.cache.getText('level' + this.level + '_text'))
 
@@ -40,29 +52,31 @@ class Level extends Phaser.State {
             boundsAlignV: "top",
             align: 'left',
         }
+
         util.setScale(this)
         
     
-        this.bg = game.add.sprite(700, game.global.DURATION, 'level1_dialog_bg')
+        // this.bg = game.add.sprite(700, game.global.DURATION, 'level1_dialog_bg')
 
-        util.centerGameObjects([this.bg])
+        // util.centerGameObjects([this.bg])
 
-        game.world.setBounds(0, 0, 1334, 750)
+        // game.world.setBounds(0, 0, 1334, 750)
 
         
         // this.startQuiz()
-        this.rollCamera(this.startDialog) 
+        // this.rollCamera(this.startDialog) 
+        // this.startDialog()
     }
 
     update() {
-
+        util.updateCharacter.call(this)
 
     }
     render() {
-        game.debug.geom(this.prompt, 'rgba(255,0,0,0.5)')
-        game.debug.cameraInfo(game.camera, 0, 0)
-        game.debug.geom(this.textGroup)
-        game.debug.geom(this.mask, 'red')
+        // game.debug.geom(this.prompt, 'rgba(255,0,0,0.5)')
+        // game.debug.cameraInfo(game.camera, 0, 0)
+        // game.debug.geom(this.textGroup)
+        // game.debug.geom(this.mask, 'red')
         // game.debug.body(this.mask, 'red')
         
     }
@@ -318,22 +332,8 @@ class Level extends Phaser.State {
         this.quizGroup = game.add.group()
         this.quizGroup.x = game.world.centerX - quizBox.width/2
         this.quizGroup.y = 0
-        this.quizGroup.scale.setTo(1.1)
+        this.quizGroup.scale.setTo(1.15)
         this.quizGroup.add(this.quizBox)
-
-        // let q_set = this.loadQuestionSet()
-
-        // if (!this.q_set) {
-        //     console.log('no more questions')
-        //     debugger
-        //     if (this.score < 8) {
-        //         this.dialog = this.endDialog.failure
-        //     } else {
-        //         this.dialog = this.endDialog.success
-        //     }
-        //     return this.startDialog()
-        //     // return this.nextDialog()
-        // }
 
         this.q_set.question = this.makeLine(this.q_set.question, game.global.QUIZ_LINE_WORDS).join('\n')
         //text group
@@ -448,10 +448,11 @@ class Level extends Phaser.State {
 
         let total = this.currentOptions.length
         let cnt = 0
+        let _cnt = -1
         let ROW = Math.ceil(total/2)
         let qBounds = this.textGroup.children[0].getBounds()
         let _h = qBounds.height
-        console.log(_h)
+        // console.log(_h)
         let margin = 50
         let _text
         let a_optionText = []
@@ -459,12 +460,19 @@ class Level extends Phaser.State {
         for (let j = 0; j < ROW; j++) {
             for (let i = 0; i < 2; i++) {
                 cnt = j * 2 + i
+                _cnt++
                 if (cnt > total -1) {
                     break
                 }
+                let line = this.makeLine(this.currentOptions[cnt], 16)
+                
                 if (total > 4) {
-                    _text = game.add.text(questionX + 24, _h + margin + cnt * 40, this.currentOptions[cnt], Object.assign({}, this.style, {font: '24px custom'}), this.textGroup)
+                    
+                    _text = game.add.text(questionX + 24, _h + margin + _cnt * 40, line.length > 1 ? line.join('\n'): this.currentOptions[cnt], Object.assign({}, this.style, {font: '24px custom'}), this.textGroup)
                     a_optionText.push(_text)
+                    for (let k = 0; k < line.length -1 ; k++) {
+                        _cnt++
+                    }
                     this.addButton(_text.x - 30, _text.y, cnt)
                 } else {
                     _text = game.add.text(this.quizBox.x + i * 160,  _h + margin + j * 40, this.currentOptions[cnt], Object.assign({}, this.style, {font: '24px custom'}), this.textGroup)
@@ -500,7 +508,7 @@ class Level extends Phaser.State {
     }
     onselect (button) {
         button.selected = !button.selected
-        console.log(button.selected)
+        // console.log(button.selected)
         if (this.currentMode !== 'multiple') {
             this.optionButtons.forEach(b => {
                 if (b.index !== button.index) {
@@ -509,7 +517,7 @@ class Level extends Phaser.State {
                 }
             })
         }
-        console.log(`current button is ${button.index}, it is ${button.selected?'selected': 'not selected'}`)
+        // console.log(`current button is ${button.index}, it is ${button.selected?'selected': 'not selected'}`)
         if (button.selected) {
             button.loadTexture('buttons', 3)
         } else {
@@ -534,7 +542,7 @@ class Level extends Phaser.State {
                 this.currentAnswer.splice(index, 0)
             }
         }
-        console.log(this.currentAnswer)
+        // console.log(this.currentAnswer)
     }
 
     onsubmit (button, pointer, isOver) {

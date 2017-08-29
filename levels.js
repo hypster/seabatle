@@ -1,5 +1,6 @@
 let level1 = new Level(1)
 let level2 = new Level(2)
+let level3 = new Level(3)
 
 // const Level = {
 //     preload() {
