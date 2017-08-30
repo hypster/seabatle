@@ -24,6 +24,7 @@ game.global = {
         bar: 3
     }
 }
+let rect
 let music
 const Main = {
     init () {

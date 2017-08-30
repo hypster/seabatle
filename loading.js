@@ -78,8 +78,8 @@ const Loading = {
         game.load.image('up', 'assets/button/up.png')
         game.load.image('right', 'assets/button/right.png')
         game.load.image('down', 'assets/button/down.png')
+        game.load.image('action', 'assets/button/action.png')
         // game.load.atlas('knight', 'assets/knight.png', 'assets/knight.json')
-        game.load.spritesheet('knight1', 'assets/character/hero.png', 32, 32)
         game.load.image('level1_building', 'assets/building/1.png')
         game.load.image('level1_dialog_bg', 'assets/level1_dialog_bg.png')
         game.load.image('hero_facial', 'assets/facial/hero1.png')
@@ -90,6 +90,13 @@ const Loading = {
         game.load.spritesheet('buttons', 'assets/buttons.png', 30, 30, 6, 0, 0)
         game.load.image('title', 'assets/title.png')
         game.load.image('warrior_facial', 'assets/facial/warrior.png')
+        //character
+        game.load.spritesheet('knight1', 'assets/character/hero.png', 32, 32)
+        game.load.spritesheet('bartender', 'assets/character/bartender.png', 32, 32)
+        game.load.spritesheet('npc1', 'assets/character/npc1.png', 32, 32)
+        game.load.spritesheet('npc5', 'assets/character/warrior2.png', 32, 32)
+        game.load.spritesheet('npc3', 'assets/character/captain.png', 32, 32)
+        game.load.spritesheet('warrior', 'assets/character/warrior3.png', 32, 32)
 
         game.load.image('builder_facial', 'assets/facial/builder.png')
         // game.load.image('title', 'assets/title1.png')
@@ -112,13 +119,13 @@ const Loading = {
         this.status.setText('加载完毕, 单击开始游戏')
         console.log('load complete')
         game.input.onTap.addOnce(function (pointer) {
-            game.state.start('Menu')
+            // game.state.start('Menu')
             // game.state.start('test')
             // game.state.start('Map')
             
             // game.state.start('level1')
             // game.state.start('level2')
-            // game.state.start('level3')
+            game.state.start('level3')
             // game.scale.startFullScreen(false)
             // game.state.states.level1.currentLevel = 0
             // music.stop()

@@ -5,6 +5,7 @@ class Level extends Phaser.State {
     }
     preload() {
         this.finish = false
+        
     }
     create() {
         this.map = game.add.tilemap('bar', 16, 16)
@@ -12,13 +13,34 @@ class Level extends Phaser.State {
         this.map.addTilesetImage('woodland_indoor_x2', 'woodland2')
         this.map.addTilesetImage('woodland_indoor_x3', 'woodland3')
         this.map.addTilesetImage('tilesetformattedupdate1', 'woodland4')
+        this.positions = {}
+        this.map.objects.position.forEach(pos => {
+            this.positions[pos.name] = pos
+        })
         
         util.addLayer.call(this, 'bar', game.global.SCALE2)
         this.layers['ground'].resizeWorld()
-        
+
         util.initWorld.call(this)
-        util.initMainCharacter.call(this, game.global.SCALE2, 10, 'startingPoint', 'knight1')
+        util.initButton.call(this, this.rollCamera)
         
+        util.initCharacter.call(this, game.global.SCALE2, 4, 'bartender', 'bartender')
+        util.initCharacter.call(this, game.global.SCALE2, 4, 'npc1', 'npc1')
+        util.initCharacter.call(this, game.global.SCALE2, 7, 'npc5', 'npc5')
+        util.initCharacter.call(this, game.global.SCALE2, 1, 'npc3', 'npc3')
+        this.warrior = util.initCharacter.call(this, game.global.SCALE2, 1, 'warrior', 'warrior')
+        
+        this.knight = util.initMainCharacter.call(this, game.global.SCALE2, 10, 'startingPoint', 'knight1')
+        
+        // let warriorPos = this.map.objects.position.filter(pos => pos.name == 'warrior')[0]
+        // let grh = game.add.graphics(0, 0)
+        // this.rect = new Phaser.Rectangle((warriorPos.x + 8 - 20) * game.global.SCALE2, (warriorPos.y + 8 -20) * game.global.SCALE2, 40 * game.global.SCALE2, 40 * game.global.SCALE2)
+        // game.physics.arcade.enable(this.rect)
+        // grh.beginFill(0xFF33ff, 0.5)
+        // grh.drawRect((warriorPos.x + 8 - 20) * game.global.SCALE2, (warriorPos.y + 8 -20) * game.global.SCALE2, 40 * game.global.SCALE2, 40 * game.global.SCALE2)
+        // grh.endFill()
+
+
         // music = game.add.audio('castle')
         // music.play()
         
@@ -69,10 +91,16 @@ class Level extends Phaser.State {
     }
 
     update() {
-        util.updateCharacter.call(this)
+        if (!this.autoMode)
+            util.updateCharacter.call(this)
+        // game.physics.arcade.collide(this.knight, this.warrior)
+        
 
     }
     render() {
+        game.debug.geom(rect, 'rgba(0, 255, 0, 0.5)')
+        // game.debug.body(this.warrior, 'rgba(0,255,0,0.5)')
+        // game.debug.body(this.knight, 'rgba(0,255,0,0.5)')
         // game.debug.geom(this.prompt, 'rgba(255,0,0,0.5)')
         // game.debug.cameraInfo(game.camera, 0, 0)
         // game.debug.geom(this.textGroup)
@@ -81,20 +109,60 @@ class Level extends Phaser.State {
         
     }
     rollCamera (cb) {
-        let x_tween = game.add.tween(this.bg)
-        let y_tween = game.add.tween(this.bg)
-        let scale_tween = game.add.tween(this.bg.scale)
-        x_tween.to({x: game.world.centerX - 80}, game.global.DURATION, Phaser.Easing.Default, true, game.global.DURATION, 0, false)
-        x_tween.onComplete.addOnce(() => {
-            y_tween.to({y: game.world.centerY - 180}, game.global.DURATION, Phaser.Easing.Default, true, 0, 0, false)
-            y_tween.onComplete.addOnce(() => {
-                let position_tween = game.add.tween(this.bg)
-                position_tween.to({y: this.bg.y - 140}, game.global.DURATION, Phaser.Easing.Default, true, game.global.DURATION, 0, false)
-                scale_tween.to({ x: 1.5, y: 1.5 }, game.global.DURATION, Phaser.Easing.Default, true, game.global.DURATION, 0, false)
-            })
-        })
+        this.autoMode = true
+        let pos = this.positions['meetingPoint']
+        let x = (pos.x + 8 ) * game.global.SCALE2
+        let y = (pos.y + 8) * game.global.SCALE2
+        console.log(x,y)
+        let t_x = game.add.tween(this.knight)
+        let t_y = game.add.tween(this.knight)
+        t_x.to({x}, 400, Phaser.Easing.Default, false, 0, 0, false)
+        t_y.to({y}, 400, Phaser.Easing.Default, false, 0, 0, false)
+
         
-        scale_tween.onComplete.addOnce(() => game.time.events.add(game.global.DURATION, cb, this), this) 
+        // this.knight.animations.currentAnim.onStart.addOnce(() => {
+            //     console.log('down anim start')
+            //     t_y.start()
+            // })
+            // this.knight.animations.play('left')
+        this.knight.animations._anims.down.onStart.addOnce(() => {
+
+        })
+
+        t_x.onComplete.addOnce(() => {
+            console.log('tween x complete')
+            this.knight.animations.play('down', 10, true)
+            t_y.start()
+        })
+        t_y.onComplete.addOnce(() => {
+            this.knight.animations.stop()
+            this.autoMode = false
+        })
+        // t_x.start()
+        this.knight.animations._anims.left.onStart.addOnce(() => {
+                console.log('left anim start')
+                t_x.start()    
+        })
+
+        this.knight.animations.play('left', 10, true)
+
+        
+        // this.autoMode = false
+        // t.to({y: to}, game.global.DURATION, Phaser.Easing.Default, true, game.global.DELAY, false, false)
+        // let x_tween = game.add.tween(this.bg)
+        // let y_tween = game.add.tween(this.bg)
+        // let scale_tween = game.add.tween(this.bg.scale)
+        // x_tween.to({x: game.world.centerX - 80}, game.global.DURATION, Phaser.Easing.Default, true, game.global.DURATION, 0, false)
+        // x_tween.onComplete.addOnce(() => {
+        //     y_tween.to({y: game.world.centerY - 180}, game.global.DURATION, Phaser.Easing.Default, true, 0, 0, false)
+        //     y_tween.onComplete.addOnce(() => {
+        //         let position_tween = game.add.tween(this.bg)
+        //         position_tween.to({y: this.bg.y - 140}, game.global.DURATION, Phaser.Easing.Default, true, game.global.DURATION, 0, false)
+        //         scale_tween.to({ x: 1.5, y: 1.5 }, game.global.DURATION, Phaser.Easing.Default, true, game.global.DURATION, 0, false)
+        //     })
+        // })
+        
+        // scale_tween.onComplete.addOnce(() => game.time.events.add(game.global.DURATION, cb, this), this) 
     }
 
     startDialog() {
@@ -102,8 +170,10 @@ class Level extends Phaser.State {
         //对话框对象
         this.dialogBox = game.add.sprite(0, 0, 'dialog_box')
         
-        this.dialogBox.x = (game.width - this.dialogBox.width)/2
-        this.dialogBox.y = game.height - this.dialogBox.height - 20
+        // this.dialogBox.x = (game.width - this.dialogBox.width)/2
+        this.dialogBox.x = this.knight.x - this.dialogBox.width/2
+        // this.dialogBox.y = game.height - this.dialogBox.height - 20
+        this.dialogBox.y = this.knight.y + 100
         
         let mask = this.mask = game.add.graphics(this.dialogBox.x, this.dialogBox.y)
         //shapes on mask must be filled!

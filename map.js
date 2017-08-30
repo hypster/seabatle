@@ -25,6 +25,7 @@ const Map = {
     },
     create() {
         util.initWorld.call(this)
+        util.initButton.call(this)
         util.initMainCharacter.call(this, game.global.SCALE, 7, 'startingPoint', 'knight1')
     },
     update() {

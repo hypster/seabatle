@@ -24,26 +24,33 @@ const util = {
         character.animations.add('left', [3, 4, 5], 10, true)
         character.animations.add('down', [0, 1, 2], 10, true)
         character.animations.add('up', [9, 10, 11], 10, true)
+        game.physics.arcade.enable(character)
+        character.body.collideWorldBounds = true
+        character.body.immovable = true
+        character.body.allowGravity = false
         return character
     },
 
     initWorld () {
         game.physics.startSystem(Phaser.Physics.ARCADE)
         game.physics.arcade.setBoundsToWorld(true, true, true, true, false)
-        cursors = game.input.keyboard.createCursorKeys();
+        cursors = game.input.keyboard.createCursorKeys()
+
     },
 
     initMainCharacter (gameScale, frame, positionName, key) {
         if (frame == undefined)
             frame = 6
-        this.knight = util.initCharacter.call(this, gameScale, frame, positionName, key)        
+        let character = util.initCharacter.call(this, gameScale, frame, positionName, key)        
+        character.body.immovable = false
         
-        game.camera.follow(this.knight)
+        game.camera.follow(character)
         
-        game.physics.arcade.enable(this.knight)
+        character.body.collideWorldBounds = true
         
-        this.knight.body.collideWorldBounds = true
-        
+        return character
+    },
+    initButton (cb) {
         //button
         this.left = false
         this.down = false
@@ -57,6 +64,35 @@ const util = {
         this.buttonGroup.push(game.add.button(_centerX, _centerY, 'right', null, this))
         this.buttonGroup.push(game.add.button(_centerX, _centerY, 'up', null, this))
         this.buttonGroup.push(game.add.button(_centerX, _centerY, 'down', null, this))
+        let action = game.add.button(1100, _centerY, 'action', function () {
+            let width = 25 * game.global.SCALE2
+            let height = 16 * game.global.SCALE2
+            switch (this.previousMove) {
+                case 1:
+                    console.log('left')
+                    rect = new Phaser.Rectangle(this.knight.x  - width, this.knight.y - height/2, width, height)
+                    break
+                    case 2:
+                    console.log('right')
+                    rect = new Phaser.Rectangle(this.knight.x, this.knight.y - height/2, width, height)
+                    break
+                    case 3:
+                    console.log('up')
+                    rect = new Phaser.Rectangle(this.knight.x - height/2, this.knight.y - width , height, width)
+                    break
+                    case 0:
+                    console.log('down')
+                    rect = new Phaser.Rectangle(this.knight.x - height/2, this.knight.y, height, width)
+                    break
+            }
+            if (Phaser.Rectangle.intersects(rect, this.warrior.body)) {
+                console.log('intersect')
+                if (cb)
+                    cb.call(this)
+            }
+        }, this)
+        action.fixedToCamera = true
+        
         this.buttonGroup.forEach(button => {
             // button.scale.setTo(1.5)
             switch (button.key) {
@@ -74,7 +110,7 @@ const util = {
                     break
             }
             button.fixedToCamera = true
-            button.events.onInputOver.add(function () {this[button.key] = true}, this)
+            button.events.onInputOver.add(function () {this[button.key] = true; this.previousKey = button.key}, this)
             button.events.onInputOut.add(function (){this[button.key] = false}, this)
             button.events.onInputDown.add(function () {this[button.key] = true}, this)
             button.events.onInputUp.add(function () {this[button.key] = false}, this)
