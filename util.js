@@ -14,6 +14,10 @@ const util = {
     initCharacter(gameScale, frame, positionName, key) {
         let startingPoint = this.map.objects.position.filter(position => position.name == positionName)[0]
         let character = game.add.sprite(0, 0, key, frame)
+        game.physics.arcade.enable(character)
+        character.body.collideWorldBounds = true
+        character.body.immovable = true
+        character.body.allowGravity = false
         character.staticFrames = [1, 4, 7, 10]
         character.anchor.setTo(0.5, 0.5)
         character.scale.setTo(2)
@@ -24,10 +28,6 @@ const util = {
         character.animations.add('left', [3, 4, 5], 10, true)
         character.animations.add('down', [0, 1, 2], 10, true)
         character.animations.add('up', [9, 10, 11], 10, true)
-        game.physics.arcade.enable(character)
-        character.body.collideWorldBounds = true
-        character.body.immovable = true
-        character.body.allowGravity = false
         return character
     },
 

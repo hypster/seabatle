@@ -91,14 +91,15 @@ class Level extends Phaser.State {
     }
 
     update() {
+        game.physics.arcade.collide(this.knight, this.warrior)
         if (!this.autoMode)
             util.updateCharacter.call(this)
-        // game.physics.arcade.collide(this.knight, this.warrior)
         
 
     }
     render() {
         game.debug.geom(rect, 'rgba(0, 255, 0, 0.5)')
+        game.debug.body(this.warrior, 'rgba(0, 255, 0, 0.5)')
         // game.debug.body(this.warrior, 'rgba(0,255,0,0.5)')
         // game.debug.body(this.knight, 'rgba(0,255,0,0.5)')
         // game.debug.geom(this.prompt, 'rgba(255,0,0,0.5)')
@@ -110,41 +111,115 @@ class Level extends Phaser.State {
     }
     rollCamera (cb) {
         this.autoMode = true
+        this.previousMove = 10
         let pos = this.positions['meetingPoint']
+        let _pos1 = this.positions['leftWalk']
+        let _pos2 = this.positions['rightWalk']
         let x = (pos.x + 8 ) * game.global.SCALE2
         let y = (pos.y + 8) * game.global.SCALE2
-        console.log(x,y)
-        let t_x = game.add.tween(this.knight)
-        let t_y = game.add.tween(this.knight)
-        t_x.to({x}, 400, Phaser.Easing.Default, false, 0, 0, false)
-        t_y.to({y}, 400, Phaser.Easing.Default, false, 0, 0, false)
-
+        let _x = this.knight.x
+        let _y = this.knight.y
+        let velocity = 100
         
-        // this.knight.animations.currentAnim.onStart.addOnce(() => {
-            //     console.log('down anim start')
-            //     t_y.start()
-            // })
-            // this.knight.animations.play('left')
-        this.knight.animations._anims.down.onStart.addOnce(() => {
+        let left = false
+        let right = false
+        let bottom = false
+        let top = false
+        // debugger
+        if (_x < this.warrior.x)
+            left = true
+        else 
+            right = true
+        if (_y < this.warrior.y)
+            top = true
+        else 
+            bottom = true
 
-        })
-
-        t_x.onComplete.addOnce(() => {
-            console.log('tween x complete')
+        if (top) {
+            //bypass route
+            let t_x1 = game.add.tween(this.knight)
+            let t_y = game.add.tween(this.knight)
+            let t_x2 = game.add.tween(this.knight)
+            let x1 = (_pos1.x + 8) * game.global.SCALE2
+            let y1 = (_pos1.y + 8) * game.global.SCALE2
+            let x2 = (_pos2.x + 8) *game.global.SCALE2
+            let y2 = (_pos2.y + 8) *game.global.SCALE2
+            t_x2.onComplete.addOnce(() => {
+                this.knight.animations.stop()
+                this.knight.frame = 10
+                this.autoMode = false
+            })
+            let duration_y = Math.round(Math.abs(_y - y) / velocity * 1000)
+            t_y.to({y}, duration_y, Phaser.Easing.Default, false, 0, 0, false)
+            t_x1.onComplete.addOnce(() => {
+                this.knight.animations.play('down', 10, true)
+                t_y.start()
+            })
+            if (left) {
+                //bypass _pos1
+                let duration_x1 = Math.round(Math.abs(_x - x1) / velocity * 1000)
+                let duration_x2 = Math.round(Math.abs(x1 - x) / velocity * 1000)
+                t_x1.to({x: x1}, duration_x1, Phaser.Easing.Default, false, 0, 0, false)
+                t_x2.to({x}, duration_x2, Phaser.Easing.Default, false, 0, 0, false)
+                t_y.onComplete.addOnce(() => {
+                    this.knight.animations.play('right', 10, true)
+                    t_x2.start()
+                })
+                this.knight.animations._anims.left.onStart.addOnce(() => {
+                    t_x1.start()
+                })
+                this.knight.animations.play('left', 10, true)
+            } else {
+                //bypass _pos2
+                let duration_x1 = Math.round(Math.abs(_x - x2) / velocity * 1000)
+                let duration_x2 = Math.round(Math.abs(x2 - x) / velocity * 1000)
+                t_x1.to({x: x2}, duration_x1, Phaser.Easing.Default, false, 0, 0, false)
+                t_x2.to({x}, duration_x2, Phaser.Easing.Default, false, 0, 0, false)
+                t_y.onComplete.addOnce(() => {
+                    this.knight.animations.play('left', 10, true)
+                    t_x2.start()
+                })
+                this.knight.animations._anims.right.onStart.addOnce(() => {
+                    t_x1.start()
+                })
+                this.knight.animations.play('right', 10, true)
+            }
+        } else {
+            //direct route
+            // debugger
+            let duration_x_direct = Math.round(Math.abs(_x - x) / velocity * 1000)
+            let duration_y_direct = Math.round(Math.abs(_y - y) / velocity * 1000)
+            let t_x = game.add.tween(this.knight)
+            let t_y = game.add.tween(this.knight)
+            t_x.to({x}, duration_x_direct, Phaser.Easing.Default, false, 0, 0, false)
+            t_y.to({y}, duration_y_direct, Phaser.Easing.Default, false, 0, 0, false)
+    
+            t_x.onComplete.addOnce(() => {
+                this.knight.animations.stop()
+                this.knight.frame = 10
+                this.autoMode = false
+            })
+            this.knight.animations._anims.down.onStart.addOnce(() => {
+                t_y.start()    
+            })
+            // t_x.start()
+            if (left) {
+                t_y.onComplete.addOnce(() => {
+                    this.knight.animations.play('right', 10, true)
+                    t_x.start()
+                })
+                
+            } else {
+                t_y.onComplete.addOnce(() => {
+                    this.knight.animations.play('left', 10, true)
+                    t_x.start()
+                })
+            }
             this.knight.animations.play('down', 10, true)
-            t_y.start()
-        })
-        t_y.onComplete.addOnce(() => {
-            this.knight.animations.stop()
-            this.autoMode = false
-        })
-        // t_x.start()
-        this.knight.animations._anims.left.onStart.addOnce(() => {
-                console.log('left anim start')
-                t_x.start()    
-        })
+        }
 
-        this.knight.animations.play('left', 10, true)
+
+
 
         
         // this.autoMode = false
