@@ -7,24 +7,16 @@ const Menu = {
     },
     init () {
         util.setScale(this)
-        // 怒海争锋
-        this.titleText = game.make.text(game.world.centerX, 100, "怒海争锋", {
-        font: 'bold 60pt',
-        fill: '#FDFFB5',
-        align: 'center'
-    });
-    this.titleText.setShadow(3, 3, 'rgba(0,0,0,0.5)', 5);
-    this.titleText.anchor.set(0.5);
     },
     create () {
         this.bg = game.add.image(0, 0, 'menu_bg')
         this.bg.width = game.width
         this.bg.height = game.height
         this.menu = []
-        game.add.existing(this.titleText)
-        music = game.add.audio('dangerous')
-        music.loop = true
-        music.play()
+        
+        // music = game.add.audio('dangerous')
+        // music.loop = true
+        // music.play()
         this.addMenuOption('新开序章', this.nextState)
         this.addMenuOption('环境设定', function () {})
         this.addMenuOption('游戏帮助', function () {})
@@ -46,7 +38,7 @@ const Menu = {
         
     },
     nextState () {
-            music.stop()
+            // music.stop()
             game.state.start('Map')
             // game.state.start('Level')
     },

@@ -17,9 +17,9 @@ const Loading = {
 
     },
     loadBgm() {
-        game.load.audio('dangerous', 'assets/audio/Dangerous.mp3')
-        game.load.audio('continent', 'assets/audio/continent.mp3')
-        game.load.audio('castle', 'assets/audio/castle.mp3')
+        // game.load.audio('dangerous', 'assets/audio/Dangerous.mp3')
+        // game.load.audio('continent', 'assets/audio/continent.mp3')
+        // game.load.audio('castle', 'assets/audio/castle.mp3')
     },
     loadScript() {
         game.load.script('font', 'lib/webfontloader.js')
@@ -30,13 +30,18 @@ const Loading = {
         game.load.text('level1_text', 'assets/level1.json')
         game.load.text('level2_text', 'assets/level2.json')
         game.load.text('level3_text', 'assets/level3.json')
+        game.load.text('level5_text', 'assets/level5.json')
         // game.load.text('level1_text', 'level1test.json')
-        game.load.physics('physicsData', 'assets/physics.json');
         // game.load.script('test', 'test.js')
     },
     loadOthers () {
         game.load.tilemap('tilemap', '/assets/tiles/tilemap.json', null, Phaser.Tilemap.TILED_JSON)
         game.load.tilemap('bar', 'assets/tiles/bar.json', null, Phaser.Tilemap.TILED_JSON)
+        game.load.tilemap('manor', 'assets/tiles/manor.json', null, Phaser.Tilemap.TILED_JSON)
+        game.load.tilemap('dock', 'assets/tiles/dock.json', null, Phaser.Tilemap.TILED_JSON)
+        
+        game.load.tilemap('cave_outside', 'assets/tiles/cave_outside.json', null, Phaser.Tilemap.TILED_JSON)
+        game.load.tilemap('cave_inside', 'assets/tiles/cave_inside.json', null, Phaser.Tilemap.TILED_JSON)
     },
     loadFonts() {
         WebFontConfig = {
@@ -59,19 +64,35 @@ const Loading = {
         console.log('text loaded')
     },
     loadImage() {
-        game.load.image('menu_bg', 'assets/menu_bg.jpg')
-        game.load.image('map', 'assets/map.png')
-        game.load.image('map_sea', 'assets/map_sea.jpg')
-        game.load.image('map_mountain', 'assets/map_mountain.jpg')
+        game.load.image('menu_bg', 'assets/menu_bg1.jpg')
+        
         //tileset
         game.load.image('grand', 'assets/tiles/grand.png')
         game.load.image('collision16x16', 'assets/tiles/collision16x16.png')
+        game.load.image('collision32x32', 'assets/tiles/collision32x32.png')
         game.load.image('water', 'assets/tiles/water.png')
 
+        //level1
+        game.load.image('castle', 'assets/tiles/Castle.png')
+        game.load.image('grass', 'assets/tiles/PathAndObjects.png')
+        game.load.image('market', 'assets/tiles/market.png')
+        game.load.image('trees', 'assets/tiles/trees1.png')
+
+        //level2
         game.load.image('woodland1', 'assets/tiles/woodland_indoor_0.png')
         game.load.image('woodland2', 'assets/tiles/woodland_indoor_x2.png')
         game.load.image('woodland3', 'assets/tiles/woodland_indoor_x3.png')
-        game.load.image('woodland4', 'assets/tiles/tilesetformattedupdate1.png')
+
+        //level3
+        game.load.image('ladder', 'assets/tiles/ship/ladder.png')
+        game.load.image('Ship_Bfix', 'assets/tiles/ship/Ship_Bfix.png')
+        game.load.image('ship', 'assets/tiles/ship/ship.png')
+        game.load.image('sea1', 'assets/tiles/ship/sea1.png')
+
+        //level5
+        game.load.image('cave', 'assets/tiles/cave.png')
+        game.load.image('objects', 'assets/tiles/objects.png')
+
 
         //button
         game.load.image('left', 'assets/button/left.png')
@@ -79,14 +100,13 @@ const Loading = {
         game.load.image('right', 'assets/button/right.png')
         game.load.image('down', 'assets/button/down.png')
         game.load.image('action', 'assets/button/action.png')
-        // game.load.atlas('knight', 'assets/knight.png', 'assets/knight.json')
-        game.load.image('level1_building', 'assets/building/1.png')
+        
         game.load.image('level1_dialog_bg', 'assets/level1_dialog_bg.png')
         game.load.image('hero_facial', 'assets/facial/hero1.png')
         game.load.image('dialog_box', 'assets/dialog_box1.png')
         game.load.image('dialog_prompt', 'assets/dialog_prompt.png')
         game.load.image('duke_facial', 'assets/facial/duke1.png')
-        game.load.image('quiz_box', 'assets/quiz_box.png')
+        game.load.image('quiz_box', 'assets/quiz_box1a.png')
         game.load.spritesheet('buttons', 'assets/buttons.png', 30, 30, 6, 0, 0)
         game.load.image('title', 'assets/title.png')
         game.load.image('warrior_facial', 'assets/facial/warrior.png')
@@ -94,9 +114,14 @@ const Loading = {
         game.load.spritesheet('knight1', 'assets/character/hero.png', 32, 32)
         game.load.spritesheet('bartender', 'assets/character/bartender.png', 32, 32)
         game.load.spritesheet('npc1', 'assets/character/npc1.png', 32, 32)
-        game.load.spritesheet('npc5', 'assets/character/warrior2.png', 32, 32)
-        game.load.spritesheet('npc3', 'assets/character/captain.png', 32, 32)
+        game.load.spritesheet('npc2', 'assets/character/npc2.png', 32, 32)
+        game.load.spritesheet('npc3', 'assets/character/npc3.png', 32, 32)
+        game.load.spritesheet('npc4', 'assets/character/npc4.png', 32, 32)
+        game.load.spritesheet('npc5', 'assets/character/npc5.png', 32, 32)
+        game.load.spritesheet('duke', 'assets/character/duke.png', 32, 32)
+        game.load.spritesheet('soldier', 'assets/character/soldier.png', 32, 32)
         game.load.spritesheet('warrior', 'assets/character/warrior3.png', 32, 32)
+        game.load.spritesheet('builder', 'assets/character/builder.png', 32, 32)
 
         game.load.image('builder_facial', 'assets/facial/builder.png')
         // game.load.image('title', 'assets/title1.png')
@@ -110,6 +135,7 @@ const Loading = {
         game.state.add('level1', level1)
         game.state.add('level2', level2)
         game.state.add('level3', level3)
+        game.state.add('level5', level5)
         // game.state.add('test', test)
 
     },
@@ -119,14 +145,15 @@ const Loading = {
         this.status.setText('加载完毕, 单击开始游戏')
         console.log('load complete')
         game.input.onTap.addOnce(function (pointer) {
+            // game.scale.startFullScreen(false)
             // game.state.start('Menu')
             // game.state.start('test')
             // game.state.start('Map')
             
             // game.state.start('level1')
             // game.state.start('level2')
-            game.state.start('level3')
-            // game.scale.startFullScreen(false)
+            // game.state.start('level3')
+            game.state.start('level5')
             // game.state.states.level1.currentLevel = 0
             // music.stop()
             // game.state.start('Level')

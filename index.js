@@ -1,4 +1,4 @@
-const game = new Phaser.Game(1334, 750, Phaser.AUTO,"seabattle")
+const game = new Phaser.Game(1334, 750, Phaser.CANVAS,"seabattle")
 game.global = {
     WORD_DELAY: 20,
     // 80,
@@ -7,7 +7,7 @@ game.global = {
     MAX_LINE: 3,
     LINE_WORDS: 28,
     LEVELS: [0, 0, 0, -1, -1],
-    QUIZ_LINE_WORDS: 15,
+    QUIZ_LINE_WORDS: 22,
     DURATION: 100,
     DELAY: 100,
     KEYMAP: {
@@ -15,6 +15,7 @@ game.global = {
         multiple: '多选题',
         truth: '判断题'
     },
+    PASS_SCORE: 3,
     SCALE: 4,
     SCALE2: 2,
     SPEED: 300,

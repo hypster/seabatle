@@ -3,7 +3,7 @@ const Map = {
 
     },
     init () {
-        music.stop()
+        // music.stop()
         this.map = game.add.tilemap('tilemap')
         this.map.addTilesetImage('grand')
         this.map.addTilesetImage('collision16x16')
@@ -13,7 +13,6 @@ const Map = {
         this.layers['sea'].resizeWorld()
         this.layers['marker'].alpha = 0
         this.map.setCollision(427, true, this.layers['marker'])
-
         util.setPosition.call(this)
         
         this.entryPoints = []
@@ -25,12 +24,19 @@ const Map = {
     },
     create() {
         util.initWorld.call(this)
+        this.addPosition()
         util.initButton.call(this)
-        util.initMainCharacter.call(this, game.global.SCALE, 7, 'startingPoint', 'knight1')
+        this.knight = util.initMainCharacter.call(this, game.global.SCALE, 7, 'startingPoint', 'knight1')
+        let pos = JSON.parse(localStorage.getItem('pos'))
+        if (pos) {
+            this.knight.x = pos.x - ((pos.radius + 10) * Math.cos(pos.angle))
+            this.knight.y =  pos.y - ((pos.radius + 10) * Math.sin(pos.angle))
+        }
+        
     },
     update() {
         util.updateCharacter.call(this)
-        game.physics.arcade.collide(this.knight, this.layers.marker, function (){console.log('collide with bound')})
+        game.physics.arcade.collide(this.knight, this.layers.marker)
         this.entryPoints.some(entry => {
             return game.physics.arcade.collide(this.knight, entry, this.nextLevelHandler)
         })
@@ -49,12 +55,23 @@ const Map = {
     // game.debug.bodyInfo(this.castle, 100, 100)
 
     },
+    
+    addPosition () {
+        this.positions = {}
+        this.map.objects.position.forEach(pos => {
+            this.positions[pos.name] = pos
+        })
+    },
     nextLevelHandler (sprite, levelBody) {
         console.log('collision')
+        // debugger
+        let centerPoint = new Phaser.Point(levelBody.x + levelBody.width/2, levelBody.y + levelBody.height/2)
+        let angle = new Phaser.Point(sprite.x, sprite.y).angle(centerPoint)
+        localStorage.setItem('pos', JSON.stringify({angle: angle, x: centerPoint.x, y: centerPoint.y, radius: Math.max(levelBody.width, levelBody.height)}))
         console.log(`level is ${levelBody.level}`)
         if (game.global.LEVELS[levelBody.level - 1] > -1) {
             // game.state.states.Level.currentLevel = levelBody.level
-            music.stop()
+            // music.stop()
             console.log(`you enter level ${levelBody.level}`)
             game.state.start('level' + levelBody.level)
         } else {

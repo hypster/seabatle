@@ -1,7 +1,293 @@
 let level1 = new Level(1)
+
 let level2 = new Level(2)
 let level3 = new Level(3)
+// let level5 = new Level(5)
 
+let _update = level1.update
+level1.addTileMap = function () {
+    this.map = game.add.tilemap('manor', 32, 32)
+    this.addPosition()
+    this.map.addTilesetImage('Castle', 'castle')
+    this.map.addTilesetImage('grass', 'grass')
+    this.map.addTilesetImage('market', 'market')
+    this.map.addTilesetImage('trees1', 'trees')
+    this.map.addTilesetImage('collison32x32', 'collision32x32')
+    util.addLayer.call(this, 'manor', game.global.SCALE2, () => {
+        level1.initCharacter()
+        this.knight = util.initMainCharacter.call(this, game.global.SCALE2, 10, 'startingPoint', 'knight1')        
+    }, 1)
+    this.layers['ground'].resizeWorld()
+    this.layers['marker'].alpha = 0
+    this.map.setCollision(881, true, this.layers['marker'])
+    this.map.setCollisionBetween(132, 133, true, this.layers['gem'], true)   
+}
+level1.preload = function () {
+
+}
+level1.initCharacter = function () {
+    this.npc = game.add.group()
+    this.npc.add(util.initCharacter.call(this, game.global.SCALE2, 2, 'npc1', 'npc1'))
+    this.npc.add(util.initCharacter.call(this, game.global.SCALE2, 7, 'npc2', 'npc2'))
+    this.npc.add(util.initCharacter.call(this, game.global.SCALE2, 1, 'npc3', 'npc3'))
+    this.npc.add(util.initCharacter.call(this, game.global.SCALE2, 1, 'soldier1', 'soldier'))
+    this.npc.add(util.initCharacter.call(this, game.global.SCALE2, 1, 'soldier2', 'soldier'))
+    this.npc.add(this.boss = util.initCharacter.call(this, game.global.SCALE2, 1, 'duke', 'duke'))
+}
+level1.update = function () {
+    _update.call(this)
+    game.physics.arcade.collide(this.knight, this.layers.gem)
+}
+
+level2.addTileMap = function () {
+    this.map = game.add.tilemap('dock', 32, 32)
+    this.addPosition()
+    this.map.addTilesetImage('Ship_Bfix', 'Ship_Bfix')
+    this.map.addTilesetImage('collision32x32', 'collision32x32')
+    this.map.addTilesetImage('ladder', 'ladder')
+    this.map.addTilesetImage('ship', 'ship')
+    // this.map.addTilesetImage('water', 'water', 16, 16)
+    
+    this.map.addTilesetImage('water' ,'water')
+    util.addLayer.call(this, 'dock', game.global.SCALE2, () => {
+        level2.initCharacter()
+        this.knight = util.initMainCharacter.call(this, game.global.SCALE2, 10, 'startingPoint', 'knight1')        
+    }, 4)
+    this.layers['sea'].resizeWorld()
+    this.layers['marker'].alpha = 0
+    this.layers['offset1'].cameraOffset.x = this.layers['offset1'].layer.offsetX
+    this.layers['offset2'].cameraOffset.x = this.layers['offset2'].layer.offsetX
+    this.map.setCollision(609, true, this.layers['marker'])
+    this.map.setCollision(610, true, this.layers['sea'])
+
+    // this.collision = game.add.group()
+    // this.collision.enableBody = true
+    // this.map.createFromObjects('barO', 'bar', 'collision16x16', null, true, false, this.collision)
+    // this.collision.children.forEach(col => {
+    
+    //     game.physics.arcade.enable(col)
+    //     col.body.immovable = true
+    // })
+    
+}
+
+level2.initCharacter = function () {
+    this.npc = game.add.group()
+    // this.npc.add(util.initCharacter.call(this, game.global.SCALE2, 2, 'npc1', 'npc1'))
+    // this.npc.add(util.initCharacter.call(this, game.global.SCALE2, 7, 'npc2', 'npc2'))
+    // this.npc.add(util.initCharacter.call(this, game.global.SCALE2, 1, 'npc3', 'npc3'))
+    // this.npc.add(util.initCharacter.call(this, game.global.SCALE2, 1, 'soldier1', 'soldier'))
+    // this.npc.add(util.initCharacter.call(this, game.global.SCALE2, 1, 'soldier2', 'soldier'))
+    this.npc.add(this.boss = util.initCharacter.call(this, game.global.SCALE2, 1, 'boss', 'builder'))
+}
+
+level2.preload = function () {
+
+}
+
+
+level3.addTileMap = function () {
+    this.map = game.add.tilemap('bar', 16, 16)
+    this.addPosition()
+    this.map.addTilesetImage('woodland_indoor_0', 'woodland1')
+    this.map.addTilesetImage('woodland_indoor_x2', 'woodland2')
+    this.map.addTilesetImage('woodland_indoor_x3', 'woodland3')
+    this.map.addTilesetImage('collision16x16', 'collision32x32')
+    // this.map.addTilesetImage('tilesetformattedupdate1', 'woodland4') 
+    util.addLayer.call(this, 'bar', game.global.SCALE2, () => {
+        level3.initCharacter()
+        this.knight = util.initMainCharacter.call(this, game.global.SCALE2, 10, 'startingPoint', 'knight1')
+    }, 1)
+    this.layers['ground'].resizeWorld()
+    this.layers['marker'].alpha = 0
+    this.map.setCollision(1345, true, this.layers['marker'])
+}
+
+level3.initCharacter = function () {
+    this.npc = game.add.group()
+    this.npc.add(util.initCharacter.call(this, game.global.SCALE2, 4, 'bartender', 'bartender'))
+    this.npc.add(util.initCharacter.call(this, game.global.SCALE2, 4, 'npc1', 'npc1'))
+    this.npc.add(util.initCharacter.call(this, game.global.SCALE2, 7, 'npc5', 'npc5'))
+    this.npc.add(util.initCharacter.call(this, game.global.SCALE2, 1, 'npc3', 'npc3'))
+    this.npc.add(util.initCharacter.call(this, game.global.SCALE2, 1, 'soldier1', 'soldier'))
+    this.npc.add(util.initCharacter.call(this, game.global.SCALE2, 1, 'soldier2', 'soldier'))
+    this.npc.add(util.initCharacter.call(this, game.global.SCALE2, 1, 'soldier3', 'soldier'))
+    this.npc.add(this.boss = util.initCharacter.call(this, game.global.SCALE2, 1, 'warrior', 'warrior'))
+}
+
+class Level5 extends Level {
+    constructor() {
+        super()
+        this.level = 5
+    }
+
+    addTileMap () {
+        this.map = game.add.tilemap('cave_inside', 16, 16)
+        this.addPosition()
+        this.map.addTilesetImage('objects', 'objects')
+        this.map.addTilesetImage('cave', 'cave')
+        this.map.addTilesetImage('collision16x16', 'collision16x16')
+        util.addLayer.call(this, 'cave_inside', game.global.SCALE, () => {
+            level5.initCharacter()
+            this.knight = util.initMainCharacter.call(this, game.global.SCALE, 2, 'startingPoint', 'knight1')
+        }, 3)
+        this.layers['black'].resizeWorld()
+        this.layers['marker'].alpha = 0
+        this.map.setCollision(386, true, this.layers['marker'])
+        let pt = this.positions['hitPoint']
+        this.scene = this.add.sprite(pt.x * game.global.SCALE, pt.y * game.global.SCALE, 'collision32x32')
+        this.scene.alpha = 0
+        this.scene.width = pt.width * game.global.SCALE
+        this.scene.height = pt.height * game.global.SCALE
+        game.physics.arcade.enable(this.scene)
+        this.scene.body.immovable = true
+        
+        this.scaleFactor = game.global.SCALE
+        
+
+        this.signal = new Phaser.Signal()
+        this.signal.addOnce(this.walkIntoPlace, this)
+    
+        // this.interacted = false
+    }
+    walkIntoPlace () {
+        
+        console.log('in walk');
+        let scale = this.scaleFactor ? this.scaleFactor: game.global.SCALE;
+        this.autoMode = true;
+        this.previousMove = 10;
+        let target = this.positions['meetingPoint'];
+        let stop = this.positions['stopPoint']
+        
+        let _nextScene = () => {
+            
+            console.log('in nextscene')
+            this.knight.animations.stop(null, true)
+            this.knight.frame = 10
+            this.autoMode = false
+            game.time.events.add(1000, this.startDialog, this)
+        };
+        let velocity = 200;
+        // debugger
+        let tweenX1 = game.add.tween(this.knight);
+        let tweenX2 = game.add.tween(this.knight);
+        let tweenY = game.add.tween(this.knight);
+        let duration_x1 = Math.round(Math.abs(this.knight.x - (stop.x + 8) * scale) / velocity * 1000);
+        let duration_x2 = Math.round(Math.abs(stop.x - (target.x + 8) * scale) / velocity * 1000);
+        let duration_y = Math.round(Math.abs(this.knight.y - (target.y + 8) * scale) / velocity * 1000);
+        let distanceX1 = Math.round((stop.x + 8) * scale)
+        let distanceX2 = Math.round((target.x + 8) * scale)
+        let distanceY = Math.round((target.y + 8) * scale)
+        // debugger
+        // console.log(target.x * scale, target.y * scale)
+        tweenY.onComplete.addOnce(() => {
+            console.log('tween y complete')
+            this.knight.animations._anims.left.play(10, true)
+            tweenX2.start()
+        });
+        tweenX1.onComplete.addOnce(() => {
+            console.log('tween x complete')
+            this.knight.animations._anims.up.play(10, true)
+            tweenY.start()    
+        });
+        tweenX2.onComplete.addOnce(() => {
+            console.log('tween x2 complete')
+            _nextScene()
+        })
+        this.knight.animations._anims.left.onStart.addOnce(() => {
+            console.log('left anim started')
+            tweenX1.start()
+        });
+        
+        tweenX1.to({x: distanceX1}, duration_x1, Phaser.Easing.Default, false, 0, 0, false)
+        tweenY.to({y: distanceY}, duration_y, Phaser.Easing.Default, false, 0, 0, false)
+        tweenX2.to({x: distanceX2}, duration_x2, Phaser.Easing.Default, false, 0, 0, false)
+        this.knight.animations._anims.left.play(10, true)
+    }
+
+    onEnterScene () {
+        console.log('enter scene')
+        this.walkIntoPlace()
+        
+    }
+    initCharacter () {
+        this.npc = game.add.group()
+        this.npc.add(this.boss = util.initCharacter.call(this, game.global.SCALE, 4, 'boss', 'bartender'))
+    }
+    
+    update () {
+        super.update()
+        game.physics.arcade.collide(this.knight, this.scene, () => {
+            console.log('collide')
+            this.signal.dispatch()
+        })
+        // if (Phaser.Rectangle.intersects(this.knight.body, this.hitPoint)) {
+        //     this.scene.dispatch()
+        //     this.autoMode = true
+        //     // this.scene.dispose()
+        // }
+    }
+    
+}
+
+let level5 = new Level5(5)
+
+
+let _update5 = level5.update()
+// level5.addTileMap = function () {
+//     this.map = game.add.tilemap('cave_inside', 16, 16)
+//     this.addPosition()
+//     this.map.addTilesetImage('objects', 'objects')
+//     this.map.addTilesetImage('cave', 'cave')
+//     this.map.addTilesetImage('collision16x16', 'collision16x16')
+//     util.addLayer.call(this, 'cave_inside', game.global.SCALE, () => {
+//         level5.initCharacter()
+//         this.knight = util.initMainCharacter.call(this, game.global.SCALE, 2, 'startingPoint', 'knight1')
+//     }, 3)
+//     this.layers['black'].resizeWorld()
+//     this.layers['marker'].alpha = 0
+//     this.map.setCollision(386, true, this.layers['marker'])
+//     let pt = this.positions['hitPoint']
+//     this.hitPoint = new Phaser.Rectangle(pt.x * game.global.SCALE, pt.y * game.global.SCALE, pt.width * game.global.SCALE, pt.height* game.global.SCALE)
+//     this.scene = new Phaser.Signal()
+
+//     this.scaleFactor = game.global.SCALE
+
+//     this.scene.addOnce(level5.onEnterScene, this)
+
+//     this.interacted = false
+// }
+
+
+
+// level5.onEnterScene = function () {
+//     console.log('enter scene')
+    
+// }
+
+// level5.initCharacter = function () {
+//     this.npc = game.add.group()
+//     this.npc.add(this.boss = util.initCharacter.call(this, game.global.SCALE, 4, 'boss', 'bartender'))
+// }
+
+// level5.update = function () {
+//     if (!this.interacted) {
+//         console.log('inside')
+//         _update5.call(this)
+//         if (Phaser.Rectangle.intersects(this.knight.body, this.hitPoint)) {
+//             this.scene.dispatch()
+//             this.interacted = true
+//             // this.scene.dispose()
+//         }
+//     }
+    
+// }
+
+// let _render = level5.render
+// level5.render = function () {
+//     _render.call(this)
+    
+// }
 // const Level = {
 //     preload() {
 //         this.level = 1
