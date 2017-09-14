@@ -11,9 +11,9 @@ const util = {
         })
     },
 
-    initCharacter(gameScale, frame, positionName, key) {
+    initCharacter(gameScale, frame, positionName, key, hint) {
         // let startingPoint = this.map.objects.position.filter(position => position.name == positionName)[0]
-        let startingPoint = this.positions[positionName]
+        let startingPoint = this.position[positionName]
         let character = game.add.sprite(0, 0, key, frame)
         game.physics.arcade.enable(character)
         character.body.collideWorldBounds = true
@@ -30,6 +30,8 @@ const util = {
         character.animations.add('left', [3, 4, 5], 10, true)
         character.animations.add('down', [0, 1, 2], 10, true)
         character.animations.add('up', [9, 10, 11], 10, true)
+        if (hint)
+            character.hint = util.createHint.call(this, {x: character.x, y: character.y - character.height/2 - 5})
         return character
     },
 
@@ -55,7 +57,11 @@ const util = {
         let rect
         let width = 25 * game.global.SCALE2
         let height = 16 * game.global.SCALE2
-        switch (this.previousMove) {
+        switch (Math.floor(this.knight.frame / 3)) {
+            case 0:
+                console.log('down')
+                rect = new Phaser.Rectangle(this.knight.x - height/2, this.knight.y, height, width)
+                break
             case 1:
                 console.log('left')
                 rect = new Phaser.Rectangle(this.knight.x  - width, this.knight.y - height/2, width, height)
@@ -68,36 +74,34 @@ const util = {
                 console.log('up')
                 rect = new Phaser.Rectangle(this.knight.x - height/2, this.knight.y - width , height, width)
                 break
-            case 0:
-                console.log('down')
-                rect = new Phaser.Rectangle(this.knight.x - height/2, this.knight.y, height, width)
-                break
         }
 
         
         if (Phaser.Rectangle.intersects(rect, this.boss.body)) {
             console.log('intersect')
+            if (this.boss.hint)
+                this.boss.hint.alpha = 0
             if (cb) {
                 this.knight.body.enable = false
                 util.disableGamePadInput.call(this)
                 cb.call(this)
             }
         }
-        if (!this.map.getLayer('gem'))
-            return
-        let x = Math.floor((rect.x + width/2) / 32 / 2)
-        let y = Math.floor((rect.y + height/2) / 32 / 2)
-        if (this.previousMove == 3) {//up
-            y = Math.floor((rect.y) / 32 / 2)
-        } else if (this.previousMove == 0) { //down
-            y = Math.floor((rect.y + height) / 32 / 2)
-        }
-        // console.log(x, y)
-        let tile = this.map.getTile(x, y, 'gem')
-        if (tile){
-            // console.log(tile)
-            this.map.removeTile(x, y, 'gem')
-        }       
+        // if (!this.map.getLayer('gem'))
+        //     return
+        // let x = Math.floor((rect.x + width/2) / 32 / 2)
+        // let y = Math.floor((rect.y + height/2) / 32 / 2)
+        // if (this.previousMove == 3) {//up
+        //     y = Math.floor((rect.y) / 32 / 2)
+        // } else if (this.previousMove == 0) { //down
+        //     y = Math.floor((rect.y + height) / 32 / 2)
+        // }
+        // // console.log(x, y)
+        // let tile = this.map.getTile(x, y, 'gem')
+        // if (tile){
+        //     // console.log(tile)
+        //     this.map.removeTile(x, y, 'gem')
+        // }       
     },
 
     initButton (cb) {
@@ -179,38 +183,37 @@ const util = {
 
         this.action.events.onInputUp.add(this.onAction? this.onAction.bind(this, cb): util.onAction.bind(this, cb), this)
     },
-    updateCharacter () {
+    updateCharacter (character) {
 
-        this.knight.body.velocity.x = 0
-        this.knight.body.velocity.y = 0
+        character.body.velocity.x = 0
+        character.body.velocity.y = 0
         if (cursors.left.isDown || cursors.right.isDown || cursors.up.isDown || cursors.down.isDown || this.left || this.right || this.up || this.down) {
-            this.knight.play('walk')
+            character.play('walk')
             
             if (cursors.left.isDown || this.left) {
-                this.knight.body.velocity.x = -game.global.SPEED
-                this.knight.play('left')
-                this.previousMove = 1
+                character.body.velocity.x = -game.global.SPEED
+                character.play('left')
+                
             }
             else if (cursors.right.isDown || this.right) {
-                this.knight.body.velocity.x = game.global.SPEED
-                this.knight.play('right')
-                this.previousMove = 2
+                character.body.velocity.x = game.global.SPEED
+                character.play('right')
+                
             }
             else if (cursors.up.isDown || this.up) {
                 
-                this.knight.body.velocity.y = -game.global.SPEED
-                this.knight.play('up')
-                this.previousMove = 3
+                character.body.velocity.y = -game.global.SPEED
+                character.play('up')
             }
             else if (cursors.down.isDown || this.down) {
                 
-                this.knight.body.velocity.y = game.global.SPEED
-                this.knight.play('down')
-                this.previousMove = 0
+                character.body.velocity.y = game.global.SPEED
+                character.play('down')
+                
             }
         } else {
-            this.knight.animations.stop()
-            this.knight.frame = this.knight.staticFrames[this.previousMove]
+            character.animations.stop()
+            character.frame = character.staticFrames[Math.floor(character.frame / 3)]
         }
         if (game.input.currentPointers == 0 && !game.input.activePointer.isMouse){this.left = false; this.right = false; this.up = false; this.down = false }
     },
@@ -234,5 +237,106 @@ const util = {
         this.map.objects.position.forEach(pos => {
             this.position[pos.name] = pos
         }, this)
+    },
+    createCollisionObj (key, offset) {
+        offset = offset ? offset: 0
+        //routePoint
+        // debugger
+        let routePoint =  this.position[key]
+        let gr = game.add.graphics(0, 0)
+        gr.drawRect(0, 0, routePoint.width, routePoint.height)
+        gr.endFill()
+        gr.anchor.setTo(0, 0)
+        gr.x = (routePoint.x + offset) * game.global.SCALE
+        gr.y = (routePoint.y + offset) * game.global.SCALE
+        gr.scale.setTo(game.global.SCALE, game.global.SCALE)
+        game.physics.arcade.enable(gr)
+        gr.body.immovable = true
+        return gr
+    },
+    moveCharacter(character, polyLines, reverse, offset, speed) {
+        return new Promise((resolve, reject) => {
+            speed = speed? speed: game.global.SPEED
+            offset = offset? offset: 0
+            this.inMove = true
+            // console.log(polyLines)
+            let polyline =  polyLines.polyline.slice()
+            if (reverse)
+                polyline = polyline.reverse()
+            let _previousX = character.x
+            let _previousY = character.y
+            let tweens = []
+            polyline.forEach ((point, i) => {
+                if (!i)
+                    return
+                let x = point[0]
+                let y = point[1]
+                x = Math.round((polyLines.x + offset + x) * game.global.SCALE)
+                y = Math.round((polyLines.y + offset + y) * game.global.SCALE)
+                
+             let _tween = game.add.tween(character)
+            tweens.push(_tween)
+            let getTweenValue = function () {
+                let previousX = _previousX
+                let previousY = _previousY
+                let direction = ''
+                let dist = 0
+                let distX = x - previousX
+                let distY = y -previousY
+                if (Math.abs(distX) > Math.abs(distY)) {
+                    dist = Math.abs(distX)
+                    if (distX < 0) {
+                        direction = 'left'
+                    } else {
+                        direction = 'right'
+                    }
+                } else {
+                    dist = Math.abs(distY)
+                    if (distY < 0) {
+                        direction = 'up'
+                    } else {
+                        direction = 'down'
+                    }
+                }
+    
+                return {direction, duration: Math.round(dist / speed * 1000)}
+                // previousMove = [(polyLines.x + x + 16) * game.global.SCALE, (polyLines.y + y + 16) * game.global.SCALE]
+            }
+            let tweenValue = getTweenValue()
+            // console.log(tweenValue.duration)
+            _tween.to({x, y}, tweenValue.duration, Phaser.Easing.Default, false)
+                _previousX = x
+                _previousY = y
+               _tween.onStart.add(function () {
+                //    console.log(`play animation ${tweenValue.direction}`)
+                   character.animations.play(tweenValue.direction)
+               }, this) 
+    
+               _tween.onComplete.add(function () {
+                   character.animations.stop()
+                   if (tweens.length) {
+                       tweens.shift().start()
+                   } else {
+                       resolve()
+                   }
+               }, this)
+            })
+            tweens.shift().start()    
+        })
+    },
+    createHint (hint, anim) {
+        if (anim == undefined)
+            anim = true
+        let _hint = game.add.sprite(hint.x, hint.y, 'questionMark', 3)
+        _hint.anchor.setTo(0.5, 0.5)
+        _hint.scale.setTo(2.5, 2.5)
+        _hint.name = hint.name
+        function addTween () {
+            let _twn = game.add.tween(_hint.scale).to({x: 2.7, y: 2.7}, 500, Phaser.Easing.Linear.InOut, false, 1000, 1, true).start()
+            _twn.onComplete.addOnce(addTween, this)
+        }
+        if (anim)
+            addTween()
+        return _hint
     }
 }

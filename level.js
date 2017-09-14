@@ -16,6 +16,7 @@ class Level extends Phaser.State {
         
         util.initButton.call(this, this.walkIntoPlace)
         
+
         // music = game.add.audio('castle')
         // music.play()
         this.fetchAllText()
@@ -34,6 +35,8 @@ class Level extends Phaser.State {
         this.line = ''
 
         this.score = 0
+        
+        
 
         
         // this.collision.forEach(col => {
@@ -69,19 +72,18 @@ class Level extends Phaser.State {
     }
 
     update() {
-        
         game.physics.arcade.collide(this.knight, this.layers.marker)
         game.physics.arcade.collide(this.knight, this.npc)
         if (this.knight.x <= 32 || this.knight.x >= this.world.width - 32 || this.knight.y <= 32 || this.knight.y >= this.world.height - 32) {
             game.state.start('Map')
         }
         if (!this.autoMode) {
-            util.updateCharacter.call(this)
+            util.updateCharacter.call(this, this.knight)
         } 
     }
     render() {
         // game.debug.geom(rect, 'rgba(0, 255, 0, 0.5)')
-        // game.debug.bodyInfo(this.knight, 20, 20)
+        game.debug.bodyInfo(this.knight, 20, 20)
         
         // game.debug.body(this.boss, 'rgba(0, 255, 0, 0.5)')
         // game.debug.body(this.knight, 'rgba(0,255,0,0.5)')
@@ -110,23 +112,23 @@ class Level extends Phaser.State {
         this.endDialog = _obj.endDialog
     
         this.questions = _obj.questions
-
+        this.stats = _obj.stats
+        console.log(this.stats)
     }
-    addPosition () {
-        this.positions = {}
-        this.map.objects.position.forEach(pos => {
-            this.positions[pos.name] = pos
-        })
-    }
+    // addPosition () {
+    //     this.positions = {}
+    //     this.map.objects.position.forEach(pos => {
+    //         this.positions[pos.name] = pos
+    //     })
+    // }
     walkIntoPlace () {
-        
         let scale = this.scaleFactor ? this.scaleFactor: game.global.SCALE2
+        // this.previousMove = 10
         this.autoMode = true
-        this.previousMove = 10
-        let pos = this.positions['meetingPoint']
+        let pos = this.position['meetingPoint']
         
-        let _pos1 = this.positions['leftWalk']
-        let _pos2 = this.positions['rightWalk']
+        let _pos1 = this.position['leftWalk']
+        let _pos2 = this.position['rightWalk']
         let x = (pos.x + 8 ) * scale
         let y = (pos.y + 8) * scale
         let _x = this.knight.x
@@ -138,7 +140,9 @@ class Level extends Phaser.State {
         let bottom = false
         let top = false
         let _nextScene = () => {
+            
             this.knight.animations.stop()
+            // this.knight.frame = this.knight.staticFrames[Math.floor(this.knight.frame / 3)]
             this.knight.frame = 10
             this.autoMode = false
             game.time.events.add(1000, this.startDialog, this)
@@ -165,6 +169,7 @@ class Level extends Phaser.State {
             t_x2.onComplete.addOnce(() => {
                 // _nextScene()
                 this.knight.animations.stop()
+                // this.knight.frame = this.knight.staticFrames[Math.floor(this.knight.frame / 3)]
                 this.knight.frame = 10
                 this.autoMode = false
                 game.time.events.add(1000, this.startDialog, this) 
@@ -272,10 +277,9 @@ class Level extends Phaser.State {
         //对话框对象
         this.dialogBox = game.add.sprite(0, 0, 'dialog_box')
         
-        // this.dialogBox.x = (game.width - this.dialogBox.width)/2
-        this.dialogBox.x = this.knight.x - this.dialogBox.width/2
+        this.dialogBox.x = game.world.camera.view.centerX - this.dialogBox.width/2
         // this.dialogBox.y = game.height - this.dialogBox.height - 20
-        this.dialogBox.y = this.knight.y + 100
+        this.dialogBox.y = game.world.camera.view.centerY + 100
         
         let mask = this.mask = game.add.graphics(this.dialogBox.x, this.dialogBox.y)
         //shapes on mask must be filled!
@@ -426,10 +430,13 @@ class Level extends Phaser.State {
         this.tween_prompt.onComplete.addOnce(this.promptTween, this)
     }
     onTap() {//对话框文字显示完成后需要加载的内容，游戏主要节点
-        if (this.finish) {
-            util.enableGamePadInput.call(this, this.walkIntoPlace)
-            this.knight.body.enable = true
-            this.quizGroup.destroy(true)
+        
+        if (this.finish && this.lines.length == this.lineIndex) {
+            if (this.passed) {
+                this.showFeedback(true)
+            } else {
+                this.showFeedback(false)
+            }
             this.dialogGroup.alpha = 0
             this.fetchAllText('restart')                        
             this.finish = false
@@ -440,6 +447,7 @@ class Level extends Phaser.State {
         game.tweens.remove(this.tween_prompt)
         this.prompt.alpha = 0
         this.text.text = ''
+        this.text.clearColors()
         //所有会话结束进入问答环节
         if (!this.dialog.length) {
             console.log('you finished all level 1 dialog')
@@ -456,8 +464,8 @@ class Level extends Phaser.State {
                 let _normal_start = colors['#fff']                
                 this.text.clearColors()
                 // _red_start - this.lineIndex * game.global.LINE_WORDS
-                this.text.addColor('red', 0)
-                this.text.addColor('#fff', _normal_start - this.lineIndex * game.global.LINE_WORDS)
+                // this.text.addColor('red', 0)
+                // this.text.addColor('#fff', _normal_start - this.lineIndex * game.global.LINE_WORDS)
                 this.lines.splice(0, this.lineIndex)
                 this.lineIndex = 0
                 this.nextLine()
@@ -470,12 +478,11 @@ class Level extends Phaser.State {
                     if (this.score < game.global.PASS_SCORE) {
                         this.dialog = this.endDialog.failure
                         this.passed = false
-                        this.score = 0
                     } else {
                         this.dialog = this.endDialog.success
                         this.passed = true
-                        this.score = 0
-                        let door = this.positions['door']
+                        this.openNextLevel()
+                        let door = this.position['door']
                         if (door) {
                             let tile = this.map.getTile(Math.floor((door.x + 16) / 32), Math.floor((door.y + 16) / 32), 'marker')
                             tile.resetCollision()
@@ -507,6 +514,61 @@ class Level extends Phaser.State {
         }
         
     }
+    showFeedback (success) {
+        // debugger
+      
+        let feedback = game.add.group()
+        // 910, 1536,
+        let _box = game.add.image(0, 0, 'feedback')
+        
+        _box.scale.setTo(2, 2)
+        let onPress = function () {
+            let _t = game.add.tween(feedback).to({alpha: 0}, game.global.DURATION, Phaser.Easing.Default, true, 0, 0, false)
+            _t.onComplete.add(() => {
+                feedback.destroy()
+                this.score = 0
+                util.enableGamePadInput.call(this, this.walkIntoPlace)
+                this.knight.body.enable = true
+                this.quizGroup.destroy(true)
+                if (!success) {
+                    game.state.start('Menu')
+                } 
+            })
+        }
+        let _cross = game.add.button(0, 0, 'cross', onPress, this)
+        _cross.anchor.setTo(0.5, 0.5)
+        _cross.scale.setTo(2, 2)
+        _cross.x = _box.width - _cross.width/3
+        _cross.y = _cross.height/3
+        feedback.add(_box)
+        feedback.add(_cross)
+        feedback.x = game.world.camera.view.centerX - _box.width/2
+        feedback.y = game.world.camera.view.centerY - _box.height/2
+        let that = this
+        function addText (x, y, txt, style, colorStop) {
+            let _txt = game.add.text(x, y, txt, Object.assign({}, that.style, style))
+            _txt.x = (_box.width - _txt.width) / 2
+            if (colorStop)
+                colorStop.forEach(stop => {
+                    _txt.addColor(stop[0], stop[1])
+                })
+            feedback.add(_txt)
+        }
+        let _title 
+        let _task
+        if (success){
+            _title = '任务完成'
+            _task = this.stats['success']
+        } else {
+            _title = '任务失败'
+            _task = this.stats['failure']
+        }
+        addText(0, 60, _title, {fontSize: 36})
+        let correctNessStr  = `你答对${this.score}/10题`
+        addText(0, 120, `你答对${this.score}/10题`, null, [['red', 3], [this.style.fill, correctNessStr.length - 1]])
+        let task = this.makeLine(_task, game.global.FEEDBACK_WORDS)
+        addText(0, 240, task.join('\n'), {fontSize: 36})
+    }
     startQuiz () {
         // this.currentMode = ''
         this.currentAnswer = []
@@ -517,8 +579,8 @@ class Level extends Phaser.State {
         
         this.quizGroup = game.add.group()
         // this.quizGroup.x = game.world.centerX - quizBox.width/2
-        this.quizGroup.x = this.knight.x - quizBox.width/2 * 1.15
-        this.quizGroup.y = this.knight.y - 340 
+        this.quizGroup.x = game.world.camera.view.centerX  - quizBox.width/2 * 1.15
+        this.quizGroup.y = game.world.camera.view.centerY - 340 
         this.quizGroup.scale.setTo(1.1)
         this.quizGroup.add(this.quizBox)
 
@@ -567,6 +629,19 @@ class Level extends Phaser.State {
             // button_tween.to({alpha: 1}, game.global.DURATION, Phaser.Easing.Default, true, 0, 0 ,false)
         })
     
+    }
+
+    openNextLevel () {
+        let currentLevel
+        for (let i = 0; i < game.global.LEVELS.length; i++) {
+            let released = game.global.LEVELS[i]
+            if (!released) {
+                currentLevel = i
+                game.global.LEVELS[i] = 1
+                break
+            }
+        }
+        game.global.CURRENTLEVEL = currentLevel
     }
 
     setTitle () {

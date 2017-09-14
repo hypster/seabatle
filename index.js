@@ -6,7 +6,11 @@ game.global = {
     // 200,
     MAX_LINE: 3,
     LINE_WORDS: 28,
-    LEVELS: [0, 0, 0, -1, -1],
+    FEEDBACK_WORDS: 13,
+    // LEVELS: [1, 1, 1, 1, 1],
+    // CURRENTLEVEL: 4,
+    LEVELS: [1, 1, 1, 1, 1],
+    CURRENTLEVEL: 3,
     QUIZ_LINE_WORDS: 22,
     DURATION: 100,
     DELAY: 100,
@@ -20,9 +24,11 @@ game.global = {
     SCALE2: 2,
     SPEED: 300,
     ENTRYTOLEVEL: {
-        castle: 1,
+        manson: 1,
         shipYard: 2,
-        bar: 3
+        bar: 3,
+        castle: 4,
+        cave: 5
     }
 }
 let rect
