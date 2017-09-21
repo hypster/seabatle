@@ -56,15 +56,20 @@ const Map = {
             _hint.alpha = 0
         })
         // debugger
-        let entryBody = this.entryPoints.children[game.global.CURRENTLEVEL]
+        this.currentLevel = this.getCurrentLevel()
+        this.getScores()
+        let entryBody = this.entryPoints.children[this.currentLevel]
         util.createHint.call(this, {x: entryBody.x, y: entryBody.y})
-        if (game.global.CURRENTLEVEL == 3) {
+        if (this.currentLevel == 3) {
             this.hints.children[0].alpha = 1
             this.hints.children[1].alpha = 1
         }
-        if (game.global.CURRENTLEVEL == 4) {
+        if (this.currentLevel == 4) {
             this.hints.children[2].alpha = 1
         }
+        
+        util.addFullScreenBtn.call(this)
+
     },
     // createHint (hint) {
     //     let _hint = game.add.sprite(hint.x * game.global.SCALE, hint.y * game.global.SCALE, 'questionMark', 3)
@@ -80,6 +85,10 @@ const Map = {
     // },
    
     create() {
+        
+        this.bgm = game.add.audio('field', 0.5, true)
+        this.bgm.fadeIn(500)
+        
         util.initWorld.call(this)
         util.setPosition.call(this)
         util.initButton.call(this)
@@ -93,13 +102,19 @@ const Map = {
             this.knight.x = pos.x
             this.knight.y =  pos.y
         }
+        this.wave = game.add.audio('wave', 1, false)
         
     },
     update() {
         game.physics.arcade.collide(this.knight, this.routePoints, this.beforeMove, null, this)
         if (this.inMove)
             return
-        util.updateCharacter.call(this, this.knight)
+        
+        util.updateCharacter.call(this, this.knight, () => {
+                if (this.knight.key == 'shipSprite' && !this.wave.isPlaying) 
+                    this.wave.play()
+            }
+        )
         game.physics.arcade.collide(this.knight, this.layers.marker)
         game.physics.arcade.collide(this.knight, this.entryPoints, this.nextLevelHandler, null, this)
         
@@ -108,8 +123,10 @@ const Map = {
         // game.debug.body(this.beach2)
         // game.debug.body(this.beach)
         // game.debug.geom(this.level1_entry,'#cfffff');
-        game.debug.body(this.knight)
-        game.debug.body(this.debug)
+
+        // game.debug.body(this.knight)
+        // game.debug.body(this.debug)
+
         // game.debug.body(this.level1_entry)
         // game.debug.body(this.routePoint)
     // game.debug.cameraInfo(game.camera, 500, 32);
@@ -121,18 +138,48 @@ const Map = {
     // game.debug.bodyInfo(this.castle, 100, 100)
 
     },
+    getCurrentLevel () {
+        // debugger
+        let levels = JSON.parse(localStorage.getItem('levels'))
+        if (!levels)
+            levels = game.global.LEVELS
+        let current = levels.length - 1
+        for (let i = 0; i < levels.length; i++) {
+            let level = levels[i]
+            if (level != 1) {
+                current = i - 1
+                break
+            }
+        }
+        return current
+    },
+    getScores () {
+        let scores = JSON.parse(localStorage.getItem('scores'))
+        game.global.SCORES = scores ? scores: game.global.SCORES
+    },
     beforeMove (knight, point) {
         let reverse = false
         if (this.inMove)
             return
         // debuggerh
-        if (point.changeTexture)
-            if (knight.key == 'knight1') {
-                knight.loadTexture('shipSprite')
-            } else {
-                knight.loadTexture('knight1')
-                reverse = true
+        if (point.changeTexture){
+            if (this.currentLevel <= 1)
+            return
+            else {
+                if (knight.key == 'knight1') {
+                    fx = game.add.audio('offshore')
+                    fx.play()
+                    knight.loadTexture('shipSprite')
+                    this.wave.play()
+                } else {
+                    fx = game.add.audio('offsea')
+                    fx.play()
+                    this.wave.stop()
+                    knight.loadTexture('knight1')
+                    reverse = true
+                }
             }
+        }
         if (point.reverse) {
             reverse = true
         }
@@ -143,25 +190,25 @@ const Map = {
 
   
     nextLevelHandler (sprite, levelBody) {
-        console.log('collision')
+        // console.log('collision')
         let pos = this.position[levelBody.key + 'Exit']
         let toSave = JSON.stringify({x: (pos.x + 16) * game.global.SCALE, y: (pos.y + 16) * game.global.SCALE})
         localStorage.setItem('pos', toSave)
-        console.log(`level is ${levelBody.level}`)
+        // console.log(`level is ${levelBody.level}`)
         if (game.global.LEVELS[levelBody.level - 1]) {
             // game.state.states.Level.currentLevel = levelBody.level
-            // music.stop()
-            console.log(`you enter level ${levelBody.level}`)
+            this.bgm.stop()
+            // console.log(`you enter level ${levelBody.level}`)
             game.state.start('level' + levelBody.level)
         } else {
-            console.log('you can\'t enter yet')
+            // console.log('you can\'t enter yet')
         }
     },
     addCustomPoint (key) {
         let entry = game.add.graphics(0, 0) 
         entry.key = key
         entry.level = game.global.ENTRYTOLEVEL[key]
-        console.log(key, entry.level)
+        // console.log(key, entry.level)
         // entry.beginFill(0xFF3300)
         entry.drawRect(0, 0, this.entry[key].width, this.entry[key].height)
         entry.endFill()

@@ -183,13 +183,13 @@ const util = {
 
         this.action.events.onInputUp.add(this.onAction? this.onAction.bind(this, cb): util.onAction.bind(this, cb), this)
     },
-    updateCharacter (character) {
-
+    updateCharacter (character, cb) {
         character.body.velocity.x = 0
         character.body.velocity.y = 0
         if (cursors.left.isDown || cursors.right.isDown || cursors.up.isDown || cursors.down.isDown || this.left || this.right || this.up || this.down) {
+            if (cb)
+                cb()            
             character.play('walk')
-            
             if (cursors.left.isDown || this.left) {
                 character.body.velocity.x = -game.global.SPEED
                 character.play('left')
@@ -212,6 +212,7 @@ const util = {
                 
             }
         } else {
+            
             character.animations.stop()
             character.frame = character.staticFrames[Math.floor(character.frame / 3)]
         }
@@ -333,10 +334,54 @@ const util = {
         _hint.name = hint.name
         function addTween () {
             let _twn = game.add.tween(_hint.scale).to({x: 2.7, y: 2.7}, 500, Phaser.Easing.Linear.InOut, false, 1000, 1, true).start()
+            // let _twn = game.add.tween(_hint).to({y: '+5'}, 500, Phaser.Easing.Linear.InOut, false, 0, 0, true).start()
             _twn.onComplete.addOnce(addTween, this)
         }
         if (anim)
             addTween()
         return _hint
+    },
+    addFullScreenBtn() {
+        let fullscreen = game.add.button(1290, 720, 'fullscreen', function () {
+            if (game.scale.isFullScreen) {
+                console.log('exit fullscreen')
+                game.scale.stopFullScreen()
+                fullscreen.loadTexture('fullscreen')
+            } else {
+                console.log('start fullscreen')
+                game.scale.startFullScreen(false)
+                fullscreen.loadTexture('exit-fullscreen')
+            }
+        }, this)
+        fullscreen.anchor.setTo(0.5, 0.5)
+        fullscreen.width = 50
+        fullscreen.height = 50
+        fullscreen.fixedToCamera = true
+        return fullscreen
+    },
+    makeLine(str, maxLineWord) {
+        let _str = str.split('\n')
+        _str = _str.map((_p) => {
+            return _p.split('')
+        })
+        for (let i = 0, length = _str.length; i < length; i++) {
+            let p = _str[i]
+            let num_space = 0
+            for (let j = 0, _len = p.length; j < _len; j++) {
+                if (j && j % maxLineWord == 0) {
+                    p.splice(j + num_space, 0, '\n')
+                    num_space++
+                }
+            }
+        }
+        let num_space = 0
+        _str.forEach((p, i) => {
+            if (!i)
+                return
+            _str.splice(i + num_space, 0, '\n')
+            num_space++
+        })
+        _str = [].concat.apply([], _str)
+        return _str.join('').split('\n')
     }
 }

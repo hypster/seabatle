@@ -4,6 +4,8 @@ const Loading = {
         this.loadingBar = game.add.image(game.world.centerX, game.world.centerY, 'loading_bar')
         this.bg.anchor.setTo(0.5)
         this.loadingBar.anchor.setTo(0.5)
+        bgm = game.add.audio('begin', 0.5, true)
+        bgm.play()
     },
     preload() {
         this.load.setPreloadSprite(this.loadingBar)
@@ -20,6 +22,27 @@ const Loading = {
         // game.load.audio('dangerous', 'assets/audio/Dangerous.mp3')
         // game.load.audio('continent', 'assets/audio/continent.mp3')
         // game.load.audio('castle', 'assets/audio/castle.mp3')
+        game.load.audio('field', 'assets/audio/field.mp3')
+        game.load.audio('manor', 'assets/audio/manor.mp3')
+        game.load.audio('bar', 'assets/audio/bar.mp3')
+        game.load.audio('dialog', 'assets/audio/dialog.mp3')
+        game.load.audio('quiz', 'assets/audio/quiz.mp3')
+        game.load.audio('castle', 'assets/audio/castle.mp3')
+        game.load.audio('cave', 'assets/audio/cave.mp3')
+        // fx
+        game.load.audio('accept', 'assets/audio/fx/accept.mp3')
+        game.load.audio('select', 'assets/audio/fx/select.mp3')
+        game.load.audio('click', 'assets/audio/fx/click.mp3')
+        game.load.audio('coin', 'assets/audio/fx/coin.mp3')
+        game.load.audio('wind', 'assets/audio/fx/wind.mp3')
+        game.load.audio('press', 'assets/audio/fx/press.mp3')
+        game.load.audio('die', 'assets/audio/fx/die.mp3')
+        game.load.audio('levelup', 'assets/audio/fx/levelup.mp3')
+        game.load.audio('ocean', 'assets/audio/fx/ocean.mp3')
+        game.load.audio('offshore', 'assets/audio/fx/splash.mp3')
+        game.load.audio('offsea', 'assets/audio/fx/offsea.mp3')
+        game.load.audio('wave', 'assets/audio/fx/wave.mp3')
+        game.load.audio('rain', 'assets/audio/fx/rain.mp3')
     },
     loadScript() {
         game.load.script('font', 'lib/webfontloader.js')
@@ -27,11 +50,17 @@ const Loading = {
         game.load.script('map', 'map.js')
         game.load.script('level', 'level.js')
         game.load.script('levels', 'levels.js')
-        game.load.text('level1_text', 'assets/level1.json')
-        game.load.text('level2_text', 'assets/level2.json')
-        game.load.text('level3_text', 'assets/level3.json')
-        game.load.text('level4_text', 'assets/level4.json')
-        game.load.text('level5_text', 'assets/level5.json')
+        game.load.script('end', 'end.js')
+        game.load.text('level1_text', 'assets/data/level1.json')
+        // game.load.text('level2_text', 'assets/data/level1.json')
+        // game.load.text('level3_text', 'assets/data/level1.json')
+        // game.load.text('level4_text', 'assets/data/level1.json')
+        // game.load.text('level5_text', 'assets/data/level1.json')
+        // game.load.text('level1_text', 'assets/data/level1_copy.json')
+        game.load.text('level2_text', 'assets/data/level2.json')
+        game.load.text('level3_text', 'assets/data/level3.json')
+        game.load.text('level4_text', 'assets/data/level4_copy.json')
+        game.load.text('level5_text', 'assets/data/level5.json')
         // game.load.text('level1_text', 'level1test.json')
         // game.load.script('test', 'test.js')
     },
@@ -67,7 +96,9 @@ const Loading = {
     },
     loadImage() {
         game.load.image('menu_bg', 'assets/menu_bg1.jpg')
-        game.load.spritesheet('questionMark', 'assets/Expressions.png', 18, 17)
+        game.load.spritesheet('questionMark', 'assets/Expressions.png', 18, 17, 15)
+        game.load.image('fullscreen', 'assets/enter-fullscreen.png')
+        game.load.image('exit-fullscreen', 'assets/exit-fullscreen.png')
         
         //grand map
         game.load.image('grand', 'assets/tiles/grand.png')
@@ -87,6 +118,7 @@ const Loading = {
         game.load.image('woodland1', 'assets/tiles/woodland_indoor_0.png')
         game.load.image('woodland2', 'assets/tiles/woodland_indoor_x2.png')
         game.load.image('woodland3', 'assets/tiles/woodland_indoor_x3.png')
+        game.load.image('rain', 'assets/rain.png')
 
         //level3
         game.load.image('ladder', 'assets/tiles/ship/ladder.png')
@@ -150,6 +182,7 @@ const Loading = {
         game.state.add('level3', level3)
         game.state.add('level4', level4)
         game.state.add('level5', level5)
+        game.state.add('end', end)
         // game.state.add('test', test)
 
     },
@@ -160,15 +193,16 @@ const Loading = {
         console.log('load complete')
         game.input.onTap.addOnce(function (pointer) {
             // game.scale.startFullScreen(false)
-            // game.state.start('Menu')
+            game.state.start('Menu')
             // game.state.start('test')
             // game.state.start('Map')
             
-            game.state.start('level1')
+            // game.state.start('level1')
             // game.state.start('level2')
             // game.state.start('level3')
             // game.state.start('level4')
             // game.state.start('level5')
+            // game.state.start('end')
             // game.state.states.level1.currentLevel = 0
             // music.stop()
             // game.state.start('Level')

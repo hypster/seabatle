@@ -7,6 +7,8 @@ let level5 = new Level(5)
 
 let _update = level1.update
 level1.addTileMap = function () {
+    this.bgm  = game.add.audio('manor', 0.5, true)
+    this.bgm.loopFull()
     this.map = game.add.tilemap('manor', 32, 32)
     util.setPosition.call(this)
     this.map.addTilesetImage('Castle', 'castle')
@@ -53,11 +55,14 @@ level1.update = function () {
     _update.call(this)
     game.physics.arcade.collide(this.knight, this.layers.gem)
     game.physics.arcade.collide(this.knight, this.coins, function (sprite, coin) {
+        fx = game.add.audio('coin')
+        fx.play()
         coin.kill()
     });
 }
 
 level2.addTileMap = function () {
+
     this.map = game.add.tilemap('dock', 32, 32)
     util.setPosition.call(this)
     this.map.addTilesetImage('Ship_Bfix', 'Ship_Bfix')
@@ -68,13 +73,35 @@ level2.addTileMap = function () {
     util.addLayer.call(this, 'dock', game.global.SCALE2, () => {
         level2.initCharacter()
         this.knight = util.initMainCharacter.call(this, game.global.SCALE2, 10, 'startingPoint', 'knight1')        
-    }, 4)
+    }, 5)
     this.layers['sea'].resizeWorld()
     this.layers['marker'].alpha = 0
     this.layers['offset1'].cameraOffset.x = this.layers['offset1'].layer.offsetX
     this.layers['offset2'].cameraOffset.x = this.layers['offset2'].layer.offsetX
     this.map.setCollision(609, true, this.layers['marker'])
-    this.map.setCollision(610, true, this.layers['sea'])    
+    this.map.setCollision(610, true, this.layers['sea'])   
+
+    emitter = game.add.emitter(game.world.camera.view.centerX, game.world.camera.view.y - 500 , 1000);
+    
+    emitter.width = game.world.camera.view.width * 1.5
+    emitter.angle = 10; // uncomment to set an angle for the rain.
+
+    emitter.makeParticles('rain');
+
+    emitter.minParticleScale = 0.3;
+    emitter.maxParticleScale = 0.7;
+
+    emitter.setYSpeed(500, 700);
+    emitter.setXSpeed(-5, 0);
+
+    emitter.minRotation = 0;
+    emitter.maxRotation = 0;
+
+    emitter.start(false, 2000, 2, 0)
+
+    fx = game.add.audio('rain', 1, true)
+    fx.play()
+               
 }
 
 level2.initCharacter = function () {
@@ -83,8 +110,16 @@ level2.initCharacter = function () {
     this.npc.add(this.boss = util.initCharacter.call(this, game.global.SCALE2, 1, 'boss', 'builder', true))
 }
 
+level2.update = function () {
+    _update.call(this)
+    emitter.x = game.world.camera.view.centerX
+    emitter.y = game.world.camera.view.y - 500
+}
 
 level3.addTileMap = function () {
+    this.bgm = game.add.audio('bar', 0.5, true)
+    this.bgm.loopFull()
+    
     this.map = game.add.tilemap('bar', 16, 16)
     util.setPosition.call(this)
     this.map.addTilesetImage('woodland_indoor_0', 'woodland1')
@@ -114,6 +149,8 @@ level3.initCharacter = function () {
 }
 
 level4.addTileMap = function () {
+    this.bgm = game.add.audio('castle')
+    this.bgm.loopFull()
     this.map = game.add.tilemap('castle', 16, 16)
     util.setPosition.call(this)
     console.log(this.positions)
@@ -133,6 +170,9 @@ level4.addTileMap = function () {
     this.debug = _p
     _p.route = this.position['route']
     this.routePoints.add(_p)
+    this.exits = game.add.group()
+    this.exits.add(util.createCollisionObj.call(this, 'exit', 0))
+    this.exits.add(util.createCollisionObj.call(this, 'entrance', 0))
 
 }
 
@@ -141,7 +181,7 @@ level4.initCharacter = function () {
     this.npc = game.add.group()
     this.npc.add(util.initCharacter.call(this, game.global.SCALE, 1, 'npc0', 'soldier'))
     this.npc.add(util.initCharacter.call(this, game.global.SCALE, 1, 'npc1', 'soldier'))
-    this.npc.add(this.boss = util.initCharacter.call(this, game.global.SCALE, 1, 'boss', 'oden'))
+    this.boss = util.initCharacter.call(this, game.global.SCALE, 1, 'boss', 'oden')
 }
 _update = level4.update
 
@@ -150,6 +190,10 @@ level4.update =  function () {
     game.physics.arcade.collide(this.knight, this.routePoints, function (knight, point) {
         if (this.inMove)
             return
+        if (this.bgm)
+            this.bgm.stop()
+        this.bgm = game.add.audio('dialog')
+        this.bgm.fadeIn(2000)
         Promise.all(this.allMovements(knight, point))
         .then(() => {
             game.time.events.add(game.global.DURATION, () => {
@@ -161,7 +205,12 @@ level4.update =  function () {
         })
         point.destroy()
     }, null, this)
-    if (!this.inMove && !this.autoMode) {
+    if (!this.inMove) {
+        game.physics.arcade.collide(this.knight, this.exits, (knight, exit) => {
+            this.bgm.stop()
+            this.bgm.destroy()
+            game.state.start('Map')
+        })
         _update.call(this)
     }
 }
@@ -171,13 +220,31 @@ level4.allMovements = function (knight, point) {
 }
 
 
-level4.render = function () {
-    game.debug.body(this.debug)
-    game.debug.body(this.knight)
+// level4.render = function () {
+//     game.debug.body(this.debug)
+//     game.debug.body(this.knight)
+// }
+
+let _afterQuiz = level4.afterQuiz
+level4.afterQuiz = function () {
+    let _t = game.add.tween(this.npc).to({alpha: 0}, 250, Phaser.Easing.Default, true, game.global.DURATION, 0, false)
+    _t.onComplete.add(() => {
+        util.moveCharacter.call(this, this.boss, this.position['escapeRoute'], false, 0, 300)
+        .then(() => {
+            let _t = game.add.tween(this.boss).to({alpha: 0}, game.global.DURATION, Phaser.Easing.Default, true, 0, 0, false)
+            _t.onComplete.add(() => {
+                this.inMove = false
+                _afterQuiz.call(this)
+            })
+        })
+    }, this)
+    
 }
 
 
 level5.addTileMap  = function () {
+    this.bgm = game.add.audio('cave')
+    this.bgm.play()
     this.map = game.add.tilemap('cave_inside', 16, 16)
     util.setPosition.call(this)
     this.map.addTilesetImage('objects', 'objects')
@@ -208,6 +275,17 @@ level5.addTileMap  = function () {
             util.moveCharacter.call(this, knight,point.route, false, 0, 500),
             util.moveCharacter.call(this, this.boss, this.position['escapeRoute'], false, 0, 200)
         ]
+    }
+
+    level5.afterQuiz = function () {
+        fx = game.add.audio('die')
+        fx.play()
+        let t = game.add.tween(this.boss).to({alpha: 0}, 500, Phaser.Easing.Default, true, game.global.DURATION, 0, false)
+        t.onComplete.add(() => {
+            game.time.events.add(250, () => {
+                _afterQuiz.call(this)
+            })
+        })
     }
     
 

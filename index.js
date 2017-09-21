@@ -10,7 +10,7 @@ game.global = {
     // LEVELS: [1, 1, 1, 1, 1],
     // CURRENTLEVEL: 4,
     LEVELS: [1, 1, 1, 1, 1],
-    CURRENTLEVEL: 3,
+    CURRENTLEVEL: 4,
     QUIZ_LINE_WORDS: 22,
     DURATION: 100,
     DELAY: 100,
@@ -19,7 +19,8 @@ game.global = {
         multiple: '多选题',
         truth: '判断题'
     },
-    PASS_SCORE: 3,
+    PASS_SCORE: 1,
+    SCORES: [0, 0, 0, 0, 0],
     SCALE: 4,
     SCALE2: 2,
     SPEED: 300,
@@ -32,7 +33,8 @@ game.global = {
     }
 }
 let rect
-let music
+let fx
+let bgm
 const Main = {
     init () {
     },
@@ -41,6 +43,7 @@ const Main = {
         game.load.image('loading_bg', 'assets/loading_bg.jpg')
         game.load.script('loading', 'loading.js')
         game.load.script('util', 'util.js')
+        game.load.audio('begin', 'assets/audio/begin.mp3')
     },
     create () {
         game.canvas.oncontextmenu = function (e) { e.preventDefault(); }
