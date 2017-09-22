@@ -254,6 +254,7 @@ const util = {
         gr.scale.setTo(game.global.SCALE, game.global.SCALE)
         game.physics.arcade.enable(gr)
         gr.body.immovable = true
+        gr.point = routePoint
         return gr
     },
     moveCharacter(character, polyLines, reverse, offset, speed) {
@@ -384,5 +385,22 @@ const util = {
         })
         _str = [].concat.apply([], _str)
         return _str.join('').split('\n')
+    },
+    showLocationIndicator (txt) {
+        game.time.events.add(500, () => {
+            let gr = game.add.graphics()
+            gr.beginFill(0x000000, 0.3);
+            // gr.drawRect(levelname.x, levelname.y, levelname.width, levelname.height)
+            gr.drawRect(0, 50, 1334, 50)
+            gr.fixedToCamera = true
+            let levelname = game.add.text(0, 0, txt, {font: '32px custom', fill: '#fff', boundsAlignH: "center", boundsAlignV: "middle"})
+            levelname.setTextBounds(0, 50, 1334, 50)
+            levelname.fixedToCamera = true
+            game.time.events.add(500, () => {
+                let t = game.add.tween(levelname).to({alpha: 0}, 500, Phaser.Easing.Default, true, 500, 0, false)
+                let t1 = game.add.tween(gr).to({alpha: 0}, 500, Phaser.Easing.Default, true, 500, 0, false)
+            })
+
+        })
     }
 }

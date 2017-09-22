@@ -18,7 +18,7 @@ const Loading = {
     },
     preload() {
         this.load.setPreloadSprite(this.loadingBar)
-        this.status = game.add.text(game.world.centerX, game.world.centerY - 30, '加载中...', { fill: 'black' });
+        this.status = game.add.text(game.world.centerX, game.world.centerY - 30, '加载中...', { fill: '#fff' });
         this.status.anchor.setTo(0.5)
         this.loadFonts()
         this.loadScript()
@@ -96,9 +96,7 @@ const Loading = {
             loading: function (name) { console.log('loading'); console.log(name) },
         }
     },
-    createText() {
-        console.log('text loaded')
-    },
+    
     loadImage() {
         game.load.image('menu_bg', 'assets/menu_bg1.jpg')
         game.load.spritesheet('questionMark', 'assets/Expressions.png', 18, 17, 15)

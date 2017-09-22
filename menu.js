@@ -47,6 +47,7 @@ const Menu = {
         localStorage.removeItem('pos')
         localStorage.removeItem('levels')
         localStorage.removeItem('scores')
+        localStorage.removeItem('locName')
         this.newState() 
     },
     reload () {

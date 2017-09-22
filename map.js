@@ -101,7 +101,16 @@ const Map = {
             this.knight.x = pos.x
             this.knight.y =  pos.y
         }
+        let name = localStorage.getItem('locName')
+        name = name ? name : '森之岛1'
+        
+        
         this.wave = game.add.audio('wave', 1, false)
+        
+        game.time.events.add(500, () => {
+            
+            util.showLocationIndicator.call(this, name)
+        })
         
     },
     update() {
@@ -183,16 +192,26 @@ const Map = {
             reverse = true
         }
         util.moveCharacter.call(this, this.knight, point.route, reverse, 16)
-        .then(() => this.inMove = false)
+        .then(() => {
+            this.inMove = false
+            let txt =point.point.type
+            if (point.changeTexture) {
+                if (knight.key == 'shipSprite') 
+                   txt = '辛特兰海域'
+            }
+            util.showLocationIndicator.call(this, txt)
+            localStorage.setItem('locName', txt)
+        })
     },
 
 
   
     nextLevelHandler (sprite, levelBody) {
         // console.log('collision')
-        let pos = this.position[levelBody.key + 'Exit']
-        let toSave = JSON.stringify({x: (pos.x + 16) * game.global.SCALE, y: (pos.y + 16) * game.global.SCALE})
-        localStorage.setItem('pos', toSave)
+        // let pos = this.position[levelBody.key + 'Exit']
+        // let toSave = JSON.stringify({x: (pos.x + 16) * game.global.SCALE, y: (pos.y + 16) * game.global.SCALE})
+        // localStorage.setItem('pos', toSave)
+        localStorage.setItem('pos', JSON.stringify({x: sprite.x, y: sprite.y}))
         // console.log(`level is ${levelBody.level}`)
         if (game.global.LEVELS[levelBody.level - 1]) {
             // game.state.states.Level.currentLevel = levelBody.level

@@ -234,6 +234,8 @@ level4.allMovements = function (knight, point) {
 
 let _afterQuiz = level4.afterQuiz
 level4.afterQuiz = function () {
+    if (!this.passed) 
+        return _afterQuiz.call(this)
     let _t = game.add.tween(this.npc).to({alpha: 0}, 250, Phaser.Easing.Default, true, game.global.DURATION, 0, false)
     _t.onComplete.add(() => {
         util.moveCharacter.call(this, this.boss, this.position['escapeRoute'], false, 0, 300)

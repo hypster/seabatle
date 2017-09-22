@@ -9,7 +9,7 @@ game.global = {
     FEEDBACK_WORDS: 13,
     // LEVELS: [1, 1, 1, 1, 1],
     // CURRENTLEVEL: 4,
-    LEVELS: [1,0, 0, 0, 0],
+    LEVELS: [1,1, 1, 1, 1],
     CURRENTLEVEL: 0,
     QUIZ_LINE_WORDS: 22,
     DURATION: 100,
@@ -30,7 +30,8 @@ game.global = {
         bar: 3,
         castle: 4,
         cave: 5
-    }
+    },
+    LEVELNAME: ['艾尔尼村', '造船厂', '港口酒吧', '城堡地下水道', '沙漠洞穴']
 }
 let rect
 let fx
@@ -40,7 +41,7 @@ const Main = {
     },
     preload () {
         game.load.image('loading_bar', 'assets/loading.png')
-        game.load.image('loading_bg', 'assets/loading_bg.jpg')
+        game.load.image('loading_bg', 'assets/preload_bg1.jpg')
         game.load.script('loading', 'loading.js')
         game.load.script('util', 'util.js')
         game.load.audio('begin', 'assets/audio/begin.mp3')

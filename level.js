@@ -44,6 +44,8 @@ class Level extends Phaser.State {
 
         util.setScale(this)
 
+        util.showLocationIndicator.call(this, game.global.LEVELNAME[this.level-1])
+        
     }
 
     update() {
@@ -835,7 +837,7 @@ class Level extends Phaser.State {
         // console.log('onsubmit')
         if (!isOver)
             return
-        fx = game.add.audio('press', 1.5, false)
+        fx = game.add.audio('press', 1, false)
         fx.play()
         let _t = game.add.tween(this.quizGroup)
         // this.giveFeedBack()
