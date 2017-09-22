@@ -6,6 +6,15 @@ const Loading = {
         this.loadingBar.anchor.setTo(0.5)
         bgm = game.add.audio('begin', 0.5, true)
         bgm.play()
+        // game.load.onLoadStart.add(() => {
+        //     console.log('load start')
+        // }, this)
+        // game.load.onFileComplete.add((progress, cachekey, success, totalLoaded, totalFiles) => {
+        //     console.log(`${cachekey} loaded, ${progress} % - ${totalLoaded} out of ${totalFiles}`)
+        // }, this)
+        // game.load.onLoadComplete.add(() => {
+        //     console.log('load complete')
+        // }, this)
     },
     preload() {
         this.load.setPreloadSprite(this.loadingBar)
@@ -51,12 +60,12 @@ const Loading = {
         game.load.script('level', 'level.js')
         game.load.script('levels', 'levels.js')
         game.load.script('end', 'end.js')
-        game.load.text('level1_text', 'assets/data/level1.json')
+        // game.load.text('level1_text', 'assets/data/level1.json')
         // game.load.text('level2_text', 'assets/data/level1.json')
         // game.load.text('level3_text', 'assets/data/level1.json')
         // game.load.text('level4_text', 'assets/data/level1.json')
         // game.load.text('level5_text', 'assets/data/level1.json')
-        // game.load.text('level1_text', 'assets/data/level1_copy.json')
+        game.load.text('level1_text', 'assets/data/level1_copy.json')
         game.load.text('level2_text', 'assets/data/level2.json')
         game.load.text('level3_text', 'assets/data/level3.json')
         game.load.text('level4_text', 'assets/data/level4_copy.json')
@@ -65,13 +74,13 @@ const Loading = {
         // game.load.script('test', 'test.js')
     },
     loadOthers () {
-        game.load.tilemap('tilemap', '/assets/tiles/tilemap.json', null, Phaser.Tilemap.TILED_JSON)
+        game.load.tilemap('bigmap', 'assets/tiles/bigmap.json', null, Phaser.Tilemap.TILED_JSON)
         game.load.tilemap('bar', 'assets/tiles/bar.json', null, Phaser.Tilemap.TILED_JSON)
         game.load.tilemap('manor', 'assets/tiles/manor.json', null, Phaser.Tilemap.TILED_JSON)
         game.load.tilemap('dock', 'assets/tiles/dock.json', null, Phaser.Tilemap.TILED_JSON)
         game.load.tilemap('castle', 'assets/tiles/castle.json', null, Phaser.Tilemap.TILED_JSON)
 
-        game.load.tilemap('cave_outside', 'assets/tiles/cave_outside.json', null, Phaser.Tilemap.TILED_JSON)
+        // game.load.tilemap('cave_outside', 'assets/tiles/cave_outside.json', null, Phaser.Tilemap.TILED_JSON)
         game.load.tilemap('cave_inside', 'assets/tiles/cave_inside.json', null, Phaser.Tilemap.TILED_JSON)
     },
     loadFonts() {
@@ -84,11 +93,6 @@ const Loading = {
                 urls: ['styles/font.css']
             },
             loading: function (name) { console.log('loading'); console.log(name) },
-            // active() { console.log('active') },
-            // inactive() { console.log('inactive') },
-            // fontloading() { console.log('fontloading') },
-            // fontactive() { console.log('font active') },
-            // fontinactive() { console.log('fontinactive') }
         }
     },
     createText() {
@@ -141,7 +145,6 @@ const Loading = {
         game.load.image('down', 'assets/button/down.png')
         game.load.image('action', 'assets/button/action.png')
         
-        game.load.image('level1_dialog_bg', 'assets/level1_dialog_bg.png')
         game.load.image('hero_facial', 'assets/facial/hero1.png')
         game.load.image('dialog_box', 'assets/dialog_box1.png')
         game.load.image('dialog_prompt', 'assets/dialog_prompt.png')
@@ -190,9 +193,8 @@ const Loading = {
         this.addGameState()
         game.scale.fullScreenScaleMode = Phaser.ScaleManager.SHOW_ALL
         this.status.setText('加载完毕, 单击开始游戏')
-        console.log('load complete')
         game.input.onTap.addOnce(function (pointer) {
-            // game.scale.startFullScreen(false)
+            game.scale.startFullScreen(false)
             game.state.start('Menu')
             // game.state.start('test')
             // game.state.start('Map')

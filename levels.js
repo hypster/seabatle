@@ -99,8 +99,8 @@ level2.addTileMap = function () {
 
     emitter.start(false, 2000, 2, 0)
 
-    fx = game.add.audio('rain', 1, true)
-    fx.play()
+    this.bgm = game.add.audio('rain', 1, true)
+    this.bgm.play()
                
 }
 
@@ -261,6 +261,9 @@ level5.addTileMap  = function () {
     let _p = util.createCollisionObj.call(this, 'trigger', 0)
     _p.route = this.position['route']
     this.routePoints.add(_p)
+
+    this.exits = game.add.group()
+    this.exits.add(util.createCollisionObj.call(this, 'exit', 0))
     }
     
     

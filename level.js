@@ -102,8 +102,8 @@ class Level extends Phaser.State {
         if (this.bgm) {
             this.bgm.stop()
         }
-        this.bgm = game.add.audio('dialog')
-        this.bgm.fadeIn(2000)
+        bgm = game.add.audio('dialog')
+        bgm.fadeIn(2000)
         let scale = this.scaleFactor ? this.scaleFactor : game.global.SCALE2
         // this.previousMove = 10
         this.autoMode = true
@@ -451,7 +451,7 @@ class Level extends Phaser.State {
                 if (!this.q_set)
                     this.q_set = this.loadQuestionSet()
                 if (!this.q_set) { //题目答完
-                    this.bgm.fadeOut(2000)
+                    bgm.fadeOut(2000)
                     this.lineIndex = 0
                     if (this.score < game.global.PASS_SCORE) {
                         this.dialog = this.endDialog.failure
@@ -471,11 +471,11 @@ class Level extends Phaser.State {
                     this.nextDialog()
 
                 } else {
-                    if (!(this.bgm.key == 'quiz')) {
-                        this.bgm.stop()
-                        this.bgm = game.add.audio('quiz', 1, true)
-                        this.bgm.onDecoded.add(() => {
-                            this.bgm.loopFull()
+                    if (bgm.key !== 'quiz') {
+                        bgm.stop()
+                        bgm = game.add.audio('quiz', 1, true)
+                        bgm.onDecoded.add(() => {
+                            bgm.loopFull()
                         })
                     }
                     let _t = game.add.tween(this.dialogGroup).to({ alpha: 0 }, game.global.DURATION, Phaser.Easing.Default, true, game.global.DURATION, 0, false)
@@ -531,7 +531,7 @@ class Level extends Phaser.State {
                     return game.state.start('Menu')
                 }
                 if (this.bgm) {
-                    this.bgm.stop()
+                    bgm.stop()
                     this.bgm.loopFull()
                 }
             })

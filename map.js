@@ -1,10 +1,9 @@
 const Map = {
     preload() {
-
     },
     init () {
         // music.stop()
-        this.map = game.add.tilemap('tilemap')
+        this.map = game.add.tilemap('bigmap')
         this.map.addTilesetImage('grand')
         this.map.addTilesetImage('collision16x16')
         this.map.addTilesetImage('water')
@@ -13,7 +12,7 @@ const Map = {
 
         // util.setPosition.call(this)
 
-        util.addLayer.call(this, 'tilemap', game.global.SCALE)        
+        util.addLayer.call(this, 'bigmap', game.global.SCALE)        
         this.layers['sea'].resizeWorld()
         this.layers['marker'].alpha = 0
         this.map.setCollision(427, true, this.layers['marker'])
