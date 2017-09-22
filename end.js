@@ -27,7 +27,7 @@ const end = {
         // txt.strokeThickness = 16;
         // txt.setShadow(2, 2, "#333333", 2, true, true);
         txt.x = game.world.camera.view.centerX -  txt.width / 2
-        txt.y = (game.world.camera.view.centerY - txt.height) / 2
+        txt.y = game.world.camera.view.centerY - txt.height / 2
         let enterKey = game.input.keyboard.addKey(Phaser.Keyboard.ENTER)
         game.input.onTap.add(this.returnToMenu, this)
         enterKey.onDown.add(this.returnToMenu, this)

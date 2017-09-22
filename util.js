@@ -14,7 +14,8 @@ const util = {
     initCharacter(gameScale, frame, positionName, key, hint) {
         // let startingPoint = this.map.objects.position.filter(position => position.name == positionName)[0]
         let startingPoint = this.position[positionName]
-        let character = game.add.sprite(0, 0, key, frame)
+        
+        let character = game.add.sprite((startingPoint.x + 8) * gameScale, (startingPoint.y + 8) * gameScale, key, frame)
         game.physics.arcade.enable(character)
         character.body.collideWorldBounds = true
         character.body.immovable = true
@@ -23,8 +24,8 @@ const util = {
         character.anchor.setTo(0.5, 0.5)
         character.scale.setTo(2)
         character.body.setSize(16, 20, 8, 0)
-        character.x = (startingPoint.x + 8) * gameScale
-        character.y = (startingPoint.y + 8) * gameScale
+        // character.x = (startingPoint.x + 8) * gameScale
+        // character.y = (startingPoint.y + 8) * gameScale
         character.SPEED = 2
         character.animations.add('right', [6, 7, 8], 10, true)
         character.animations.add('left', [3, 4, 5], 10, true)

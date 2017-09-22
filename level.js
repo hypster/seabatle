@@ -77,9 +77,9 @@ class Level extends Phaser.State {
     fetchAllText(key) {
         let _obj = JSON.parse(game.cache.getText('level' + this.level + '_text'))
         key = key ? key : 'initial'
-        if (key == 'initial')
+        if (key == 'initial' || key == 'monolog')
             this.dialog = _obj.dialog[key]
-        else {
+        else if (key == 'restart'){
             if (this.passed) {
                 this.dialog = _obj.dialog[key]['success']
             } else
@@ -99,6 +99,7 @@ class Level extends Phaser.State {
     //     })
     // }
     walkIntoPlace() {
+        this.bossFight = true
         if (this.bgm) {
             this.bgm.stop()
         }
@@ -411,14 +412,19 @@ class Level extends Phaser.State {
         this.tween_prompt.onComplete.addOnce(this.promptTween, this)
     }
     onTap() {//对话框文字显示完成后需要加载的内容，游戏主要节点
-
-        if (this.finish && this.lines.length == this.lineIndex) {
-            this.afterQuiz()
+        if (this.bossFight && this.finish && this.lines.length == this.lineIndex) {
             this.dialogGroup.alpha = 0
+            this.afterQuiz()
             this.fetchAllText('restart')
             this.finish = false
+            this.bossFight = false
             return
             // return game.state.start('Map')
+        } else if (!this.bossFight && this.lines.length == this.lineIndex) {
+            this.fetchAllText()
+            util.enableGamePadInput.call(this, this.walkIntoPlace)
+            this.dialogGroup.alpha = 0
+            return 
         }
         game.input.onTap.remove(this.onTap, this)
         game.tweens.remove(this.tween_prompt)
@@ -473,7 +479,7 @@ class Level extends Phaser.State {
                 } else {
                     if (bgm.key !== 'quiz') {
                         bgm.stop()
-                        bgm = game.add.audio('quiz', 1, true)
+                        bgm = game.add.audio('quiz', 0.5, true)
                         bgm.onDecoded.add(() => {
                             bgm.loopFull()
                         })
@@ -524,6 +530,10 @@ class Level extends Phaser.State {
                 util.enableGamePadInput.call(this, this.walkIntoPlace)
                 this.knight.body.enable = true
                 this.quizGroup.destroy(true)
+                if (this.level == 3) {
+                    this.fetchAllText('monolog')
+                    this.startDialog()
+                }
                 if (this.level == 5) {
                     game.state.start('end')
                 }
@@ -876,12 +886,22 @@ class Level extends Phaser.State {
         let _previous = this.currentMode
         this.q_set = this.loadQuestionSet()
         let _current = this.currentMode
-        let _b = `答对了，小伙子我看好你, 但下面我还要再出几道`
+        let _b
+        if (this.level == 4 || this.level == 5)
+            _b = `可恶，竟然被你答对了，看来我要拿出更强的实力出来了，下面这几道`
+        else
+            _b = `答对了，但下面我还要再出几道`
         let _length = _b.length
         if (_previous != _current) {
-            this.lines = this.makeLine(`${_b}${game.global.KEYMAP[_current]}来考验考验你`, game.global.LINE_WORDS)
+            if (this.level == 4 || this.level == 5 )
+                this.lines = this.makeLine(`${_b}${game.global.KEYMAP[_current]}一定会让你发出来自地狱的呐喊`, game.global.LINE_WORDS)
+            else
+                this.lines = this.makeLine(`${_b}${game.global.KEYMAP[_current]}来考验考验你`, game.global.LINE_WORDS)
         } else {
-            this.lines = this.makeLine('答对了，小伙子我看好你', game.global.LINE_WORDS)
+            if (this.level == 4 || this.level == 5)
+                this.lines = this.makeLine('可恶竟然被你答对了', game.global.LINE_WORDS)
+            else
+                this.lines = this.makeLine('答对了', game.global.LINE_WORDS)
         }
         if (_length) {
             this.text.addColor('dfcab0', _length)
@@ -906,9 +926,16 @@ class Level extends Phaser.State {
         }
         _length2 = _b.length
         if (_previous != _current) {
-            _b = `${_b}, 下面我再出几道`
+            if (this.level == 4 || this.level == 5) 
+                _b = `${_b}, 让你尝一下我更强的实力吧，下面几道`
+            else
+                _b = `${_b}, 下面我再出几道`
             _length3 = _b.length
-            this.lines = this.makeLine(`${_b}${game.global.KEYMAP[_current]}来考验一下你，你的机会已经不多了`, game.global.LINE_WORDS)
+            if (this.level == 4 || this.level == 5)
+                this.lines = this.makeLine(`${_b}${game.global.KEYMAP[_current]}会让你切身发出来自地狱的呐喊`, game.global.LINE_WORDS)
+            else 
+                this.lines = this.makeLine(`${_b}${game.global.KEYMAP[_current]}来考验一下你，你的机会已经不多了`, game.global.LINE_WORDS)
+            
         } else {
             this.lines = this.makeLine(`${_b}`, game.global.LINE_WORDS)
         }

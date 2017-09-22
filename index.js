@@ -9,7 +9,7 @@ game.global = {
     FEEDBACK_WORDS: 13,
     // LEVELS: [1, 1, 1, 1, 1],
     // CURRENTLEVEL: 4,
-    LEVELS: [1, 0, 0, 0, 0],
+    LEVELS: [1,0, 0, 0, 0],
     CURRENTLEVEL: 0,
     QUIZ_LINE_WORDS: 22,
     DURATION: 100,

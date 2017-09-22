@@ -47,7 +47,7 @@ const Menu = {
         localStorage.removeItem('pos')
         localStorage.removeItem('levels')
         localStorage.removeItem('scores')
-        this.nextState() 
+        this.newState() 
     },
     reload () {
         bgm.stop()
@@ -59,9 +59,12 @@ const Menu = {
         game.global.LEVELS = levels ? levels: game.global.LEVELS
         this.nextState()
     },
+    newState () {
+        game.state.start('intro') 
+    },
     nextState () {
-            // music.stop()
-            game.state.start('Map')
+        // music.stop()
+        game.state.start('Map')
             // game.state.start('Level')
     },
     changeStyle (target) {

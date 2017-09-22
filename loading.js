@@ -56,6 +56,7 @@ const Loading = {
     loadScript() {
         game.load.script('font', 'lib/webfontloader.js')
         game.load.script('Menu', 'menu.js')
+        game.load.script('intro', 'intro.js')
         game.load.script('map', 'map.js')
         game.load.script('level', 'level.js')
         game.load.script('levels', 'levels.js')
@@ -65,10 +66,10 @@ const Loading = {
         // game.load.text('level3_text', 'assets/data/level1.json')
         // game.load.text('level4_text', 'assets/data/level1.json')
         // game.load.text('level5_text', 'assets/data/level1.json')
-        game.load.text('level1_text', 'assets/data/level1_copy.json')
+        game.load.text('level1_text', 'assets/data/level1.json')
         game.load.text('level2_text', 'assets/data/level2.json')
         game.load.text('level3_text', 'assets/data/level3.json')
-        game.load.text('level4_text', 'assets/data/level4_copy.json')
+        game.load.text('level4_text', 'assets/data/level4.json')
         game.load.text('level5_text', 'assets/data/level5.json')
         // game.load.text('level1_text', 'level1test.json')
         // game.load.script('test', 'test.js')
@@ -179,6 +180,7 @@ const Loading = {
     addGameState() {
         game.state.add('Menu', Menu)
         game.state.add('Map', Map)
+        game.state.add('intro', Intro)
         // game.state.add('Level', Level)
         game.state.add('level1', level1)
         game.state.add('level2', level2)

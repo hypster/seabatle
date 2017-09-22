@@ -129,7 +129,7 @@ const Map = {
         // game.debug.body(this.level1_entry)
         // game.debug.body(this.routePoint)
     // game.debug.cameraInfo(game.camera, 500, 32);
-    game.debug.spriteCoords(this.knight, 32, 32);
+    // game.debug.spriteCoords(this.knight, 32, 32);
     // game.debug.body(this.entryPoints[0], 'rgba(255,0, 0,0.5)')
     // game.debug.body(this.entryPoints[1], 'rgba(255,0, 0,0.5)')
     // game.debug.geom(this.entryPoints[0], 'rgba(255,0, 0,0.5)')

@@ -37,8 +37,6 @@ level1.addTileMap = function () {
         _coin.body.immovable = true
         this.coins.add(_coin)        
     })
-    
-    
 }
 
 level1.initCharacter = function () {
@@ -49,7 +47,6 @@ level1.initCharacter = function () {
     this.npc.add(util.initCharacter.call(this, game.global.SCALE2, 1, 'soldier1', 'soldier'))
     this.npc.add(util.initCharacter.call(this, game.global.SCALE2, 1, 'soldier2', 'soldier'))
     this.npc.add(this.boss = util.initCharacter.call(this, game.global.SCALE2, 1, 'duke', 'duke', true))
-    
 }
 level1.update = function () {
     _update.call(this)
@@ -59,6 +56,15 @@ level1.update = function () {
         fx.play()
         coin.kill()
     });
+}
+let _create = level1.create 
+level1.create = function () {
+    _create.call(this)
+    util.disableGamePadInput.call(this)
+    game.time.events.add(500, () => {
+        this.fetchAllText('monolog')   
+        this.startDialog()
+    })
 }
 
 level2.addTileMap = function () {
@@ -149,11 +155,11 @@ level3.initCharacter = function () {
 }
 
 level4.addTileMap = function () {
-    this.bgm = game.add.audio('castle')
+    this.bgm = game.add.audio('castle', 0.5)
     this.bgm.loopFull()
     this.map = game.add.tilemap('castle', 16, 16)
     util.setPosition.call(this)
-    console.log(this.positions)
+    // console.log(this.positions)
     this.map.addTilesetImage('sewer_1', 'sewer_1')
     this.map.addTilesetImage('cave', 'cave')
     this.map.addTilesetImage('collision16x16', 'collision16x16')
@@ -192,8 +198,9 @@ level4.update =  function () {
             return
         if (this.bgm)
             this.bgm.stop()
-        this.bgm = game.add.audio('dialog')
-        this.bgm.fadeIn(2000)
+        bgm = game.add.audio('dialog', 0.5)
+        bgm.fadeIn(2000)
+        this.bossFight = true
         Promise.all(this.allMovements(knight, point))
         .then(() => {
             game.time.events.add(game.global.DURATION, () => {
@@ -243,8 +250,8 @@ level4.afterQuiz = function () {
 
 
 level5.addTileMap  = function () {
-    this.bgm = game.add.audio('cave')
-    this.bgm.play()
+    this.bgm = game.add.audio('cave', 0.5)
+    this.bgm.loopFull()
     this.map = game.add.tilemap('cave_inside', 16, 16)
     util.setPosition.call(this)
     this.map.addTilesetImage('objects', 'objects')
